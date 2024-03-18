@@ -78,7 +78,7 @@ check_installed_status(){
 
 # 检查MTProxy新版本
 check_New_ver(){
-    New_ver=$(curl -s https://api.github.com/repos/RyanY610/MTProxy/releases/latest | grep -oP '"tag_name": "\K([^"]+)')
+    New_ver=$(curl -s https://api.github.com/repos/elesssss/MTProxy/releases/latest | grep -oP '"tag_name": "\K([^"]+)')
     Old_ver=$(cat ${Old_ver_file})
     if [[ "${Old_ver}" != "${New_ver}" ]]; then
         echo -e "${Info} 发现 MTProxy 已有新版本 [ ${New_ver} ]，旧版本 [ ${Old_ver} ]"
@@ -104,7 +104,7 @@ Download(){
     cd "${mtproxy_dir}"
     echo -e "${Info} 开始下载 mtproxy......"
     check_Arch
-    wget --no-check-certificate https://github.com/RyanY610/MTProxy/releases/download/${New_ver}/MTProxy-${New_ver}-linux-${Arch}.tar.gz
+    wget --no-check-certificate https://github.com/elesssss/MTProxy/releases/download/${New_ver}/MTProxy-${New_ver}-linux-${Arch}.tar.gz
     tar xvf MTProxy-${New_ver}-linux-${Arch}.tar.gz
     rm -f MTProxy-${New_ver}-linux-${Arch}.tar.gz
     chmod +x mtproxy
