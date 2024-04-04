@@ -551,23 +551,23 @@ backmenu(){
 menu() {
     clear
     echo -e "${Green}######################################
-    #          ${Red}MTProxy 一键脚本          ${Green}#
-    #         作者: ${Yellow}你挺好看啊🍏          ${Green}#
-    ######################################
-    0.${Nc} 退出脚本
-    ———————————————————————
-    ${Green} 1.${Nc} 安装 MTProxy
-    ${Green} 2.${Nc} 更新 MTProxy
-    ${Green} 3.${Nc} 卸载 MTProxy
-    ———————————————————————
-    ${Green} 4.${Nc} 启动 MTProxy
-    ${Green} 5.${Nc} 停止 MTProxy
-    ${Green} 6.${Nc} 重启 MTProxy
-    ———————————————————————
-    ${Green} 7.${Nc} 设置 MTProxy配置
-    ${Green} 8.${Nc} 查看 MTProxy链接
-    ${Green} 9.${Nc} 查看 MTProxy日志
-    ———————————————————————" && echo
+#          ${Red}MTProxy 一键脚本          ${Green}#
+#         作者: ${Yellow}你挺好看啊🍏          ${Green}#
+######################################
+0.${Nc} 退出脚本
+———————————————————————
+${Green} 1.${Nc} 安装 MTProxy
+${Green} 2.${Nc} 更新 MTProxy
+${Green} 3.${Nc} 卸载 MTProxy
+———————————————————————
+${Green} 4.${Nc} 启动 MTProxy
+${Green} 5.${Nc} 停止 MTProxy
+${Green} 6.${Nc} 重启 MTProxy
+———————————————————————
+${Green} 7.${Nc} 设置 MTProxy配置
+${Green} 8.${Nc} 查看 MTProxy链接
+${Green} 9.${Nc} 查看 MTProxy日志
+———————————————————————" && echo
 
     if [[ -e ${mtproxy_file} ]]; then
         check_pid
