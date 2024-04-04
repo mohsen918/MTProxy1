@@ -115,7 +115,7 @@ Write_config(){
     cat >${mtproxy_conf} <<-EOF
 PORT=${mtp_port}
 PASSWORD=${mtp_passwd}
-SECURE=${mtp_secure}
+SECURE=${SECURE}
 FAKE-TLS=${mtp_tls}
 TAG=${mtp_tag}
 IPadderv4=${mtp_nat_ipv4}
@@ -269,7 +269,7 @@ Set_nat(){
             mtp_nat_ipv4="${ipv4}"
         fi
         echo && echo "========================"
-        echo -e "	IPadderv4 : ${Red_globa} ${mtp_nat_ipv4} ${Nc}"
+        echo -e "	IPv4 : ${Red_globa} ${mtp_nat_ipv4} ${Nc}"
         echo "========================" && echo
     fi
 }
@@ -291,7 +291,7 @@ Set(){
         mtp_tag=${tag}
         mtp_nat_ipv4=${nat_ipv4}
         mtp_nat_ipv6=${nat_ipv6}
-        mtp_secure=${secure}
+        SECURE=${secure}
         Set_port
         Write_config
         Restart
@@ -301,7 +301,7 @@ Set(){
         mtp_tag=${tag}
         mtp_nat_ipv4=${nat_ipv4}
         mtp_nat_ipv6=${nat_ipv6}
-        mtp_secure=${secure}
+        SECURE=${secure}
         Set_passwd
         Write_config
         Restart
@@ -312,7 +312,7 @@ Set(){
         mtp_tls=${fake_tls}
         mtp_nat_ipv4=${nat_ipv4}
         mtp_nat_ipv6=${nat_ipv6}
-        mtp_secure=${secure}
+        SECURE=${secure}
         Set_tag
         Write_config
         Restart
@@ -322,7 +322,7 @@ Set(){
         mtp_passwd=${password}
         mtp_tls=${fake_tls}
         mtp_tag=${tag}
-        mtp_secure=${secure}
+        SECURE=${secure}
         Set_nat
         Write_config
         Restart
@@ -342,6 +342,7 @@ Set(){
 Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
     echo -e "${Info} 开始安装/配置 依赖..."
+    vps_info
 	install_base
     echo -e "${Info} 开始下载/安装..."
     check_New_ver
