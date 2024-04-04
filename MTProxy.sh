@@ -115,7 +115,7 @@ Write_config(){
     cat >${mtproxy_conf} <<-EOF
 PORT=${mtp_port}
 PASSWORD=${mtp_passwd}
-SECURE=${SECURE}
+SECURE=${mtp_secure}
 FAKE-TLS=${mtp_tls}
 TAG=${mtp_tag}
 IPadderv4=${mtp_nat_ipv4}
