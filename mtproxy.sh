@@ -118,7 +118,7 @@ PASSWORD=${mtp_passwd}
 SECURE=${SECURE}
 FAKE-TLS=${mtp_tls}
 TAG=${mtp_tag}
-IP-IPv4=${mtp_nat_ipv4}
+IPadderv4=${mtp_nat_ipv4}
 NTP_TIME=time.google.com
 BUFFER-WRITE=${buffer_write}
 BUFFER-READ=${buffer_read}
@@ -138,7 +138,7 @@ After=network.target
 Type=simple
 WorkingDirectory=/usr/local/MTProxy
 EnvironmentFile=/usr/local/MTProxy/config.toml
-ExecStart=/usr/local/MTProxy/mtproxy run -b 0.0.0.0:${PORT} -4 ${IP-IPv4}:${PORT} ${SECURE} ${TAG} --ntp-server=${NTP_TIME}
+ExecStart=/usr/local/MTProxy/mtproxy run -b 0.0.0.0:${PORT} -4 ${IPadderv4}:${PORT} ${SECURE} ${TAG} --ntp-server=${NTP_TIME}
 StandardOutput=append:/usr/local/MTProxy/mtproxy.log
 StandardError=append:/usr/local/MTProxy/mtproxy.log
 Restart=always
@@ -155,7 +155,7 @@ Read_config(){
     password=$(cat ${mtproxy_conf} | grep 'PASSWORD=' | awk -F 'PASSWORD=' '{print $NF}')
     fake_tls=$(cat ${mtproxy_conf} | grep 'FAKE-TLS=' | awk -F 'FAKE-TLS=' '{print $NF}')
     tag=$(cat ${mtproxy_conf} | grep 'TAG=' | awk -F 'TAG=' '{print $NF}')
-    nat_ipv4=$(cat ${mtproxy_conf} | grep 'IP-IPv4=' | awk -F 'IP-IPv4=' '{print $NF}')
+    nat_ipv4=$(cat ${mtproxy_conf} | grep 'IPadderv4=' | awk -F 'IPadderv4=' '{print $NF}')
     nat_ipv6=$(cat ${mtproxy_conf} | grep 'NAT-IPv6=' | awk -F 'NAT-IPv6=' '{print $NF}')
     secure=$(cat ${mtproxy_conf} | grep 'SECURE=' | awk -F 'SECURE=' '{print $NF}')
     buffer_write=$(cat ${mtproxy_conf} | grep 'BUFFER-WRITE=' | awk -F 'BUFFER-WRITE=' '{print $NF}')
@@ -269,7 +269,7 @@ Set_nat(){
             mtp_nat_ipv4="${ipv4}"
         fi
         echo && echo "========================"
-        echo -e "	IP-IPv4 : ${Red_globa} ${mtp_nat_ipv4} ${Nc}"
+        echo -e "	IPadderv4 : ${Red_globa} ${mtp_nat_ipv4} ${Nc}"
         echo "========================" && echo
     fi
 }
