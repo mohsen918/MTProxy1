@@ -125,7 +125,7 @@ BUFFER-READ=${buffer_read}
 STATS-BIND=${stats_bind}
 ANTI-REPLAY-MAX-SIZE=${anti_replay_max_size}
 MULTIPLEX-PER-CONNECTION=${multiplex_per_connection}
-    EOF
+	EOF
 }
 
 Write_Service(){
@@ -145,7 +145,7 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
-    EOF
+	EOF
     systemctl enable mtproxy
 }
 
