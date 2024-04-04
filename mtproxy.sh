@@ -138,7 +138,7 @@ After=network.target
 Type=simple
 WorkingDirectory=/usr/local/MTProxy
 EnvironmentFile=/usr/local/MTProxy/config.toml
-ExecStart=/usr/local/MTProxy/mtproxy run -b 0.0.0.0:${PORT} ${SECURE} ${TAG} --ntp-server=${NTP_TIME}
+ExecStart=/usr/local/MTProxy/mtproxy run -b 0.0.0.0:${PORT} -4 ${NAT-IPv4}:${PORT} ${SECURE} ${TAG} --ntp-server=${NTP_TIME}
 StandardOutput=append:/usr/local/MTProxy/mtproxy.log
 StandardError=append:/usr/local/MTProxy/mtproxy.log
 Restart=always
