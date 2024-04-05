@@ -64,7 +64,7 @@ Download(){
         mkdir "${mtproxy_dir}"
     fi
     cd "${mtproxy_dir}"
-    echo -e "${Info} 开始下载 mtproxy......"
+    echo -e "${Info} 开始下载/安装..."
     curl -O https://raw.githubusercontent.com/elesssss/MTProxy/main/Python/mtproxy.py
 
     cat >${mtproxy_conf} <<-EOF
@@ -99,6 +99,7 @@ MODES = {
 }
 
 Write_Service(){
+    echo -e "${Info} 开始写入 Service..."
     cat >/etc/systemd/system/mtproxy.service <<-'EOF'
 [Unit]
 Description=MTProxy
@@ -189,6 +190,7 @@ Set_tag(){
 }
 
 Set(){
+    echo -e "${Info} 开始设置 用户配置..."
     check_installed_status
     echo && echo -e "你要做什么？
 ${Green}1.${Nc}  修改 端口配置
@@ -218,16 +220,12 @@ ${Green}4.${Nc}  修改 全部配置" && echo
 
 Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
-    echo -e "${Info} 开始安装/配置 依赖..."
     install_base
     vps_info
-    echo -e "${Info} 开始下载/安装..."
     Download
-    echo -e "${Info} 开始设置 用户配置..."
     Set_port
     Set_passwd
     Set_tag
-    echo -e "${Info} 开始写入 Service..."
     Write_Service
     echo -e "${Info} 所有步骤 执行完毕，开始启动..."
     Start
