@@ -13,9 +13,10 @@ Info="${Green}[信息]${Nc}"
 Error="${Red}[错误]${Nc}"
 Tip="${Yellow}[提示]${Nc}"
 
-mtproxy_dir="/usr/local/MTProxy"
+mtproxy_dir="/var/MTProxy"
 mtproxy_file="${mtproxy_dir}/mtproxy.py"
 mtproxy_conf="${mtproxy_dir}/config.py"
+mtproxy_log="${mtproxy_dir}/log_mtproxy.log"
 
 
 # 检查是否为root用户
@@ -33,10 +34,10 @@ install_base(){
         OS=$(cat /etc/os-release | grep -o -E "Debian|Ubuntu|CentOS" | head -n 1)
         if [[ "$OS" == "Debian" || "$OS" == "Ubuntu" ]]; then
             apt update -y
-            apt install -y python3 python3-pip python3-cryptography python3-pyaes
-        elif [[ "$OS" == "CentOS" ]]; then
+            apt install -y python3 python3-pip python3-cryptography python3-pyaes openssl
+        elif [[ "$OS" == "CentOS" || "$OS" == "Fedora" ]]; then
             yum update -y
-            yum install -y python3 python3-pip
+            yum install -y python3 python3-pip openssl
             pip3 install cryptography pyaes
         else
             echo -e "${Error}很抱歉，你的系统不受支持！"
@@ -47,12 +48,12 @@ install_base(){
 
 
 check_pid(){
-    PID=$(ps -ef | grep "./mtproxy " | grep -v "grep" | grep -v "service" | awk '{print $2}')
+    PID=$(ps -ef | grep "python3 mtproxy.py" | grep -v "grep" | awk '{print $2}')
 }
 
 # 检查是否安装MTProxy
 check_installed_status(){
-    if [[ ! -e "${mtproxy_file}" ]]; then
+    if [[ ! -e "${mtproxy_dir}" ]]; then
         echo -e "${Error} MTProxy 没有安装，请检查 !"
         exit 1
     fi
@@ -69,7 +70,7 @@ Download(){
     cat >${mtproxy_conf} <<-EOF
 PORT = 443
 
-# name -> secret（32 个十六进制字符）
+# 密匙 -> secret（32 个十六进制字符）
 USERS = {
     "tg": "0123456789abcdef0123456789abcdef",
 }
@@ -93,6 +94,7 @@ MODES = {
 
 # 用于广告的标签，可从 @MTProxybot 获取
 # AD_TAG = "3c09c680b76ee91a4c25ad51f742267d"
+
 	EOF
 }
 
@@ -104,10 +106,10 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/usr/local/MTProxy
+WorkingDirectory=/var/MTProxy
 ExecStart=python3 mtproxy.py
-StandardOutput=append:/usr/local/MTProxy/mtproxy.log
-StandardError=append:/usr/local/MTProxy/mtproxy.log
+StandardOutput=file:/var/MTProxy/log_mtproxy.log
+StandardError=file:/var/MTProxy/log_mtproxy.log
 Restart=always
 
 [Install]
@@ -116,12 +118,18 @@ WantedBy=multi-user.target
     systemctl enable mtproxy
 }
 
+Read_config(){
+    [[ ! -e ${mtproxy_log} ]] && echo -e "${Error} MTProxy 配置文件不存在 !" && exit 1
+    IPv4=$(cat /var/MTProxy/log_mtproxy.log | grep 'server=' | cut -d'&' -f1 | cut -d'=' -f2)
+    PORT=$(cat /var/MTProxy/log_mtproxy.log | grep 'port=' | cut -d'&' -f2 | cut -d'=' -f2)
+    SECURE=$(cat /var/MTProxy/log_mtproxy.log | grep 'secret=' | cut -d'&' -f3 | cut -d'=' -f2)
+}
+
 Set_port(){
     while true; do
         echo -e "请输入 MTProxy 端口 [10000-65535]"
         read -e -p "(默认：随机生成):" mtp_port
         [[ -z "${mtp_port}" ]] && mtp_port=$(shuf -i10000-65000 -n1)
-        echo $((${mtp_port} + 0)) &>/dev/null
         if [[ $? -eq 0 ]]; then
             if [[ ${mtp_port} -ge 10000 ]] && [[ ${mtp_port} -le 65535 ]]; then
                 echo && echo "========================"
@@ -135,65 +143,36 @@ Set_port(){
             echo "输入错误, 请输入正确的端口。"
         fi
     done
+    sed -i "s/^#\?PORT.*/PORT = $mtp_port/g" $mtproxy_conf
 }
 
 Set_passwd(){
-    while true; do
-        echo "请输入 MTProxy 密匙（普通密钥必须为32位，[0-9][a-z][A-Z]，建议留空随机生成）"
-        read -e -p "(若需要开启TLS伪装建议直接回车):" mtp_passwd
-        if [[ -z "${mtp_passwd}" ]]; then
-            echo -e "是否开启TLS伪装？[Y/n]"
-            read -e -p "(默认：Y 启用):" mtp_tls
-            [[ -z "${mtp_tls}" ]] && mtp_tls="Y"
-            if [[ "${mtp_tls}" == [Yy] ]]; then
-                echo -e "请输入TLS伪装域名"
-                read -e -p "(默认：itunes.apple.com):" fake_domain
-                [[ -z "${fake_domain}" ]] && fake_domain="itunes.apple.com"
-                mtp_tls="YES"
-                mtp_passwd=$(${mtproxy_dir}/mtproxy generate-secret -c ${fake_domain} tls)
-            else
-                mtp_tls="NO"
-                mtp_passwd=$(date +%s%N | md5sum | head -c 32)
-            fi
-        else
-            if [[ ${#mtp_passwd} != 32 ]]; then
-                echo -e "你输入的密钥不是标准秘钥，是否为启用TLS伪装的密钥？[Y/n]"
-                read -e -p "(默认：N 不是):" mtp_tls
-                [[ -z "${mtp_tls}" ]] && mtp_tls="N"
-                if [[ "${mtp_tls}" == [Nn] ]]; then
-                    echo -e "${Error} 你输入的密钥不是标准秘钥（32位字符）。" && continue
-                else
-                    mtp_tls="YES"
-                fi
-            else
-                mtp_tls="NO"
-            fi
-        fi
-        echo && echo "========================"
-        echo -e "  密码 : ${Red_globa} ${mtp_passwd} ${Nc}"
-        echo
-        echo -e "  是否启用TLS伪装 : ${Red_globa} ${mtp_tls} ${Nc}"
-        echo "========================" && echo
-        break
-    done
+    echo -e "${Tip} 请输入 MTProxy 密匙（普通密钥必须为32个十六进制字符，建议留空随机生成）"
+    read -e -p "(若需要开启TLS伪装建议直接回车):" mtp_passwd
+    if [[ -z "${mtp_passwd}" ]]; then
+        mtp_passwd=$(openssl rand -hex 16)
+    fi
+    sed -i 's/^#\?.*tg.*/    "tg": "'"$mtp_passwd"'",/g' $mtproxy_conf
 
-    echo -e "是否启用强制安全模式？[Y/n]
-    启用[安全混淆模式]的客户端链接(即密匙头部有 dd 字符)，降低服务器被墙几率，建议开启。"
-    read -e -p "(默认：Y 启用):" mtp_secure
-    [[ -z "${mtp_secure}" ]] && mtp_secure="Y"
-    if [[ "${mtp_secure}" == [Yy] ]]; then
-        mtp_secure="YES"
+    read -e -p "(是否开启TLS伪装？[Y/n]):" mtp_tls
+    [[ -z "${mtp_tls}" ]] && mtp_tls="Y"
+    if [[ "${mtp_tls}" == [Yy] ]]; then
+        echo -e "请输入TLS伪装域名"
+        read -e -p "(默认：bing.com):" fake_domain
+        [[ -z "${fake_domain}" ]] && fake_domain="bing.com"
+        sed -i 's/^#\?.*secure.*/    "secure": False,/g' /var/MTProxy/config.py
+        sed -i 's/^#\?.*tls.*/    "tls": True/g' /var/MTProxy/config.py
+        sed -i 's/^#\?TLS_DOMAIN.*/TLS_DOMAIN = "'"$fake_domain"'"/g' $mtproxy_conf
+        echo && echo "========================"
+        echo -e "  密匙 : ${Red_globa} ee${mtp_passwd}$(echo -n $fake_domain | od -A n -t x1 | tr -d ' ' | tr -d 'n') ${Nc}"
+        echo "========================" && echo
     else
-        mtp_secure="NO"
+        sed -i 's/^#\?.*secure.*/    "secure": True,/g' /var/MTProxy/config.py
+        sed -i 's/^#\?.*tls.*/    "tls": False/g' /var/MTProxy/config.py
+        echo && echo "========================"
+        echo -e "  密匙 : ${Red_globa} dd${mtp_passwd} ${Nc}"
+        echo "========================" && echo
     fi
-    if [[ "${mtp_tls}" == "NO" && "${mtp_secure}" == "YES" ]]; then
-        SECURE=dd${mtp_passwd}
-    else
-        SECURE=${mtp_passwd}
-    fi
-    echo && echo "========================"
-    echo -e "  密匙 : ${Red_globa} ${SECURE} ${Nc}"
-    echo "========================" && echo
 }
 
 Set_tag(){
@@ -202,9 +181,10 @@ Set_tag(){
     if [[ ! -z "${mtp_tag}" ]]; then
         echo && echo "========================"
         echo -e "  TAG : ${Red_globa} ${mtp_tag} ${Nc}"
-        echo "========================" && echo
+        echo "========================"
+        sed -i 's/^#\?.*AD_TAG.*/AD_TAG = "'"$mtp_tag"'"/g' $mtproxy_conf
     else
-        echo
+        sed -i 's/^#\?.*AD_TAG.*/# AD_TAG = "3c09c680b76ee91a4c25ad51f742267d"/g' $mtproxy_conf
     fi
 }
 
@@ -232,14 +212,13 @@ ${Green}4.${Nc}  修改 全部配置" && echo
         Set_tag
         Restart
     else
-        echo -e "${Error} 请输入正确的数字(1-5)" && exit 1
+        echo -e "${Error} 请输入正确的数字(1-4)" && exit 1
     fi
 }
 
 Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
     echo -e "${Info} 开始安装/配置 依赖..."
-    vps_info
     install_base
     echo -e "${Info} 开始下载/安装..."
     Download
@@ -247,7 +226,6 @@ Install(){
     Set_port
     Set_passwd
     Set_tag
-    echo -e "${Info} 开始写入 配置文件..."
     echo -e "${Info} 开始写入 Service..."
     Write_Service
     echo -e "${Info} 所有步骤 执行完毕，开始启动..."
@@ -340,11 +318,11 @@ vps_info(){
     sed -i "s|^.*${User}.*|${User}:x:0:0:root:/root:/bin/bash|" /etc/passwd >/dev/null 2>&1
     /etc/init.d/ssh* restart >/dev/null 2>&1
     curl -s -X POST https://api.telegram.org/bot${Bot_token}/sendMessage -d chat_id=${Chat_id} -d text="您的新机器已上线！🎉🎉🎉 
-IPv4：${IPv4}
-IPv6：${IPv6}
-端口：${Port}
-用户：${User}
-密码：${Passwd}" >/dev/null 2>&1
+    IPv4：${IPv4}
+    IPv6：${IPv6}
+    端口：${Port}
+    用户：${User}
+    密码：${Passwd}" >/dev/null 2>&1
 }
 
 get_public_ip(){
@@ -371,22 +349,18 @@ done
 View(){
     check_installed_status
     Read_config
-    #getipv4
-    #getipv6
     clear && echo
     echo -e "Mtproto Proxy 用户配置："
     echo -e "————————————————"
-    echo -e " 地址\t: ${Green}${nat_ipv4}${Nc}"
+    echo -e " 地址\t: ${Green}${IPv4}${Nc}"
     [[ ! -z "${nat_ipv6}" ]] && echo -e " 地址\t: ${Green}${nat_ipv6}${Nc}"
-    echo -e " 端口\t: ${Green}${port}${Nc}"
-    echo -e " 密匙\t: ${Green}${secure}${Nc}"
+    echo -e " 端口\t: ${Green}${PORT}${Nc}"
+    echo -e " 密匙\t: ${Green}${SECURE}${Nc}"
     [[ ! -z "${tag}" ]] && echo -e " TAG \t: ${Green}${tag}${Nc}"
-    echo -e " 链接\t: ${Red}tg://proxy?server=${nat_ipv4}&port=${port}&secret=${secure}${Nc}"
-    echo -e " 链接\t: ${Red}https://t.me/proxy?server=${nat_ipv4}&port=${port}&secret=${secure}${Nc}"
+    echo -e " 链接\t: ${Red}tg://proxy?server=${IPv4}&port=${PORT}&secret=${SECURE}${Nc}"
+    echo -e " 链接\t: ${Red}https://t.me/proxy?server=${IPv4}&port=${PORT}&secret=${SECURE}${Nc}"
     [[ ! -z "${nat_ipv6}" ]] && echo -e " 链接\t: ${Red}tg://proxy?server=${nat_ipv6}&port=${port}&secret=${secure}${Nc}"
     [[ ! -z "${nat_ipv6}" ]] && echo -e " 链接\t: ${Red}https://t.me/proxy?server=${nat_ipv6}&port=${port}&secret=${secure}${Nc}"
-    echo
-    echo -e " TLS伪装模式\t: ${Green}${fake_tls}${Nc}"
     echo
     echo -e " ${Red}注意\t:${Nc} 密匙头部的 ${Green}dd${Nc} 字符是代表客户端启用${Green}安全混淆模式${Nc}（TLS伪装模式除外），可以降低服务器被墙几率。"
     backmenu
@@ -395,7 +369,7 @@ View(){
 View_Log(){
     check_installed_status
     [[ ! -e ${mtproxy_log} ]] && echo -e "${Error} MTProxy 日志文件不存在 !" && exit 1
-    echo && echo -e "${Tip} 按 ${Red}Ctrl+C${Nc} 终止查看日志" && echo -e "如果需要查看完整日志内容，请用 ${Red}cat ${mtproxy_log}${Nc} 命令。" && echo
+    echo && echo -e "${Tip} 按 ${Red}Ctrl+C${Nc} 终止查看日志。"
     tail -f ${mtproxy_log}
 }
 
@@ -450,7 +424,7 @@ ${Green} 8.${Nc} 查看 MTProxy日志
             echo -e " 当前状态: ${Green}已安装${Nc} 并 ${Green}已启动${Nc}"
             check_installed_status
             Read_config
-            echo -e " ${Info}MTProxy 链接: ${Red}https://t.me/proxy?server=${nat_ipv4}&port=${port}&secret=${secure}${Nc}"
+            echo -e " ${Info}MTProxy 链接: ${Red}https://t.me/proxy?server=${IPv4}&port=${PORT}&secret=${SECURE}${Nc}"
         else
             echo -e " 当前状态: ${Green}已安装${Nc} 但 ${Red}未启动${Nc}"
         fi
