@@ -452,7 +452,7 @@ vps_info(){
     get_public_ip
     IPv4="${ipv4}"
     IPv6="${ipv6}"
-    if [ -d /etc/ssh/sshd_config ]; then
+    if [ -f /etc/ssh/sshd_config ]; then
         Port=$(cat /etc/ssh/sshd_config | grep '^#\?Port' | awk '{print $2}' | sort -rn | head -1)
     fi
     User="Root"
