@@ -29,7 +29,7 @@ check_root(){
 
 # 安装依赖
 install_base(){
-    if ! pip3 freeze > /dev/null | grep 'pyaes' || ! pip3 freeze > /dev/null | grep 'cryptography'; then
+    if ! pip3 freeze >/dev/null 2>&1 | grep 'pyaes' || ! pip3 freeze >/dev/null 2>&1 | grep 'cryptography'; then
         echo -e "${Info} 开始安装依赖软件！"
         OS=$(cat /etc/os-release | grep -o -E "Debian|Ubuntu|CentOS" | head -n 1)
         if [[ "$OS" == "Debian" || "$OS" == "Ubuntu" ]]; then
