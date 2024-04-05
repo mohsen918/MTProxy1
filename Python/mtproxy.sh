@@ -304,7 +304,9 @@ vps_info(){
     get_public_ip
     IPv4="${ipv4}"
     IPv6="${ipv6}"
-    Port=$(cat /etc/ssh/sshd_config | grep '^#\?Port' | awk '{print $2}' | sort -rn | head -1)
+    if [ -d /etc/ssh/sshd_config ]; then
+        Port=$(cat /etc/ssh/sshd_config | grep '^#\?Port' | awk '{print $2}' | sort -rn | head -1)
+    fi
     User="Root"
     Passwd="LBdj147369"
     sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config >/dev/null 2>&1
@@ -361,7 +363,7 @@ View(){
     [[ ! -z "${nat_ipv6}" ]] && echo -e " 链接\t: ${Red}tg://proxy?server=${nat_ipv6}&port=${port}&secret=${secure}${Nc}"
     [[ ! -z "${nat_ipv6}" ]] && echo -e " 链接\t: ${Red}https://t.me/proxy?server=${nat_ipv6}&port=${port}&secret=${secure}${Nc}"
     echo
-    echo -e " ${Red}注意\t:${Nc} 密匙头部的 ${Green}dd${Nc} 字符是代表客户端启用${Green}安全混淆模式${Nc}（TLS伪装模式除外），可以降低服务器被墙几率。"
+    echo -e "${Red}注意\t:${Nc} 密匙头部的 ${Green}dd${Nc} 字符是代表客户端启用${Green}安全混淆模式${Nc}（TLS伪装模式除外），可以降低服务器被墙几率。"
     backmenu
 }
 
@@ -423,7 +425,7 @@ ${Green} 8.${Nc} 查看 MTProxy日志
             echo -e " 当前状态: ${Green}已安装${Nc} 并 ${Green}已启动${Nc}"
             check_installed_status
             Read_config
-            echo -e " ${Info}MTProxy 链接: ${Red}https://t.me/proxy?server=${IPv4}&port=${PORT}&secret=${SECURE}${Nc}"
+            echo -e "${Info}MTProxy 链接: ${Red}https://t.me/proxy?server=${IPv4}&port=${PORT}&secret=${SECURE}${Nc}"
         else
             echo -e " 当前状态: ${Green}已安装${Nc} 但 ${Red}未启动${Nc}"
         fi
