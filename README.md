@@ -3,4 +3,7 @@
 ## MTProxy 一键脚本
 ```
 bash <(curl -sSL https://raw.githubusercontent.com/elesssss/MTProxy/main/mtproxy.sh)
+
+## MTProxy-python一键脚本
 ```
+bash <(curl -sSL https://raw.githubusercontent.com/elesssss/MTProxy/main/Python/mtproxy.sh)
