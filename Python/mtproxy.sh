@@ -220,6 +220,7 @@ Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
     echo -e "${Info} 开始安装/配置 依赖..."
     install_base
+    vps_info
     echo -e "${Info} 开始下载/安装..."
     Download
     echo -e "${Info} 开始设置 用户配置..."
