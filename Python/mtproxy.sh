@@ -37,7 +37,7 @@ install_base(){
 	  		apt install -y iproute2 python3 python3-pip python3-cryptography python3-pyaes openssl
 	 	fi
     else
-        echo -e "${Error}很抱歉，你的系统不受支持！"
+        echo -e "${Error} 很抱歉，你的系统不受支持！"
         exit 1
     fi
 }
