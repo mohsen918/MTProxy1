@@ -108,7 +108,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/var/MTProxy
-ExecStart=python3 mtproxy.py
+ExecStart=python3 /var/MTProxy/mtproxy.py
 StandardOutput=file:/var/MTProxy/log_mtproxy.log
 StandardError=file:/var/MTProxy/log_mtproxy.log
 Restart=always
