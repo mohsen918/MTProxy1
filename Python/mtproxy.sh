@@ -35,10 +35,6 @@ install_base(){
         if [[ "$OS" == "Debian" || "$OS" == "Ubuntu" ]]; then
             apt update -y
             apt install -y iproute2 python3 python3-pip python3-cryptography python3-pyaes openssl
-        elif [[ "$OS" == "CentOS" || "$OS" == "Fedora" ]]; then
-            yum update -y
-            yum install -y iproute python3 python3-pip openssl
-            pip3 install cryptography pyaes
         else
             echo -e "${Error}很抱歉，你的系统不受支持！"
             exit 1
