@@ -29,20 +29,6 @@ check_root(){
 
 # 安装依赖
 install_base(){
-    if ! pip3 freeze | grep 'pyaes' &>/dev/null || ! pip3 freeze | grep 'cryptography' &>/dev/null; then
-        echo -e "${Info} 开始安装/配置 依赖..."
-        OS=$(cat /etc/os-release | grep -o -E "Debian|Ubuntu|CentOS" | head -n 1)
-        if [[ "$OS" == "Debian" || "$OS" == "Ubuntu" ]]; then
-            apt update -y
-            apt install -y iproute2 python3 python3-pip python3-cryptography python3-pyaes openssl
-        else
-            echo -e "${Error}很抱歉，你的系统不受支持！"
-            exit 1
-        fi
-    fi
-}
-
-install_base(){
     OS=$(cat /etc/os-release | grep -o -E "Debian|Ubuntu|CentOS" | head -n 1)
     if [[ "$OS" == "Debian" || "$OS" == "Ubuntu" ]]; then
         if ! pip3 freeze | grep 'pyaes' &>/dev/null || ! pip3 freeze | grep 'cryptography' &>/dev/null; then
