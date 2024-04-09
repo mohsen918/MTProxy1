@@ -15,7 +15,7 @@ Tip="${Yellow}[提示]${Nc}"
 
 mtproxy_dir="/var/MTProxy"
 mtproxy_file="${mtproxy_dir}/mtproxy.py"
-mtproxy_conf="${mtproxy_dir}/config.py
+mtproxy_conf="${mtproxy_dir}/config.py"
 mtproxy_log="${mtproxy_dir}/log_mtproxy.log"
 
 
