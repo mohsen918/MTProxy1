@@ -482,8 +482,8 @@ get_public_ip(){
     ipv6=""
 
     for i in "${InterFace[@]}"; do
-        Public_IPv4=$(curl -s4m8 --interface "$i" ip.sb -k | sed '/^\(2a09\|104\.28\)/d')
-        Public_IPv6=$(curl -s6m8 --interface "$i" ip.sb -k | sed '/^\(2a09\|104\.28\)/d')
+        Public_IPv4=$(curl -s4m8 --interface "$i" ip.gs -k | sed '/^\(2a09\|104\.28\)/d')
+        Public_IPv6=$(curl -s6m8 --interface "$i" ip.gs -k | sed '/^\(2a09\|104\.28\)/d')
 
         # 检查是否获取到IP地址
         if [[ -n "$Public_IPv4" ]]; then
