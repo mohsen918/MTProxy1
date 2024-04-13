@@ -29,17 +29,17 @@ check_root(){
 
 # 安装依赖
 install_base(){
-    if ! command -v wget &>/dev/null || ! command -v tar &>/dev/null || ! command -v ntpdate &>/dev/null; then
+    if ! command -v wget &>/dev/null || ! command -v ip &>/dev/null || ! command -v tar &>/dev/null || ! command -v ntpdate &>/dev/null; then
         echo -e "${Info} 开始安装依赖软件！"
         OS=$(cat /etc/os-release | grep -o -E "Debian|Ubuntu|CentOS" | head -n 1)
         if [[ "$OS" == "Debian" || "$OS" == "Ubuntu" ]]; then
             apt update -y
-            apt install -y wget tar ntpdate
+            apt install -y wget tar ntpdate iproute2
             systemctl unmask systemd-timesyncd.service >/dev/null 2>&1
             ntpdate time.google.com
         elif [[ "$OS" == "CentOS" ]]; then
             yum update -y
-            yum install -y wget tar ntpdate
+            yum install -y wget tar ntpdate iproute
             systemctl unmask systemd-timesyncd.service >/dev/null 2>&1
             ntpdate time.google.com
         else
@@ -452,18 +452,18 @@ get_public_ip(){
     ipv6=""
 
     for i in "${InterFace[@]}"; do
-        Public_IPv4=$(curl -s4m8 --interface "$i" api64.ipify.org -k | sed '/^\(2a09\|104\.28\)/d')
-        Public_IPv6=$(curl -s6m8 --interface "$i" api64.ipify.org -k | sed '/^\(2a09\|104\.28\)/d')
+        Public_IPv4=$(curl -s4m8 --interface "$i" ip.gs -k | sed '/^\(2a09\|104\.28\)/d')
+        Public_IPv6=$(curl -s6m8 --interface "$i" ip.gs -k | sed '/^\(2a09\|104\.28\)/d')
 
-    # 检查是否获取到IP地址
-    if [[ -n "$Public_IPv4" ]]; then
-        ipv4="$Public_IPv4"
-    fi
+        # 检查是否获取到IP地址
+        if [[ -n "$Public_IPv4" ]]; then
+            ipv4="$Public_IPv4"
+        fi
 
-    if [[ -n "$Public_IPv6" ]]; then
-        ipv6="$Public_IPv6"
-    fi
-done
+        if [[ -n "$Public_IPv6" ]]; then
+            ipv6="$Public_IPv6"
+        fi
+    done
 }
 
 View(){
