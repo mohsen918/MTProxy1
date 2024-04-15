@@ -43,7 +43,7 @@ install_base(){
 }
 
 check_pid(){
-    PID=$(ps -ef | grep "python3 mtproxy.py" | grep -v "grep" | awk '{print $2}')
+    PID=$(ps -ef | grep "mtproxy.py" | grep -v "grep" | awk '{print $2}')
 }
 
 # 检查是否安装MTProxy
