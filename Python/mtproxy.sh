@@ -360,8 +360,8 @@ View(){
     [[ ! -z "${IPv6}" ]] && echo -e " 链接\t: ${Red}tg://proxy?server=${IPv6}&port=${PORT}&secret=${SECURE}${Nc}"
     [[ ! -z "${IPv6}" ]] && echo -e " 链接\t: ${Red}https://t.me/proxy?server=${IPv6}&port=${PORT}&secret=${SECURE}${Nc}"
     echo
-    echo -e "${Tip} 密匙头部的 ${Green}ee${Nc} 字符是代表客户端启用${Green}TLS伪装模式${Nc} ，可以降低服务器被墙几率。"
-    echo -e "${Tip} 密匙头部的 ${Green}dd${Nc} 字符是代表客户端启用${Green}安全混淆模式${Nc}（TLS伪装模式除外），可以降低服务器被墙几率。"
+    echo -e "${Tip} 密匙头部的 ${Green}ee${Nc} 字符是代表客户端启用 ${Green}TLS伪装模式${Nc} ，可以降低服务器被墙几率。"
+    echo -e "${Tip} 密匙头部的 ${Green}dd${Nc} 字符是代表客户端启用 ${Green}安全混淆模式${Nc}（TLS伪装模式除外），可以降低服务器被墙几率。"
     backmenu
 }
 
