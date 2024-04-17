@@ -94,7 +94,7 @@ MODES = {
 
 Write_Service(){
     echo -e "${Info} 开始写入 Service..."
-    cat >/etc/systemd/system/mtproxy.service <<-'EOF'
+    cat >/lib/systemd/system/MTProxy.service <<-'EOF'
 [Unit]
 Description=MTProxy
 After=network.target
@@ -235,7 +235,7 @@ Start(){
         sleep 1s
         menu
     else
-        systemctl start mtproxy.service
+        systemctl start MTProxy.service
         sleep 1s
         check_pid
         if [[ ! -z ${PID} ]]; then
@@ -252,7 +252,7 @@ Stop(){
         sleep 1s
         menu
     else
-        systemctl stop mtproxy.service
+        systemctl stop MTProxy.service
         sleep 1s
         menu
     fi
@@ -283,7 +283,7 @@ Uninstall(){
             systemctl stop mtproxy
         fi
         systemctl disable mtproxy
-        rm -rf ${mtproxy_dir}  /etc/systemd/system/mtproxy.service
+        rm -rf ${mtproxy_dir}  /lib/systemd/system/MTProxy.service
         echo
         echo "MTProxy 卸载完成 !"
         echo
