@@ -48,7 +48,7 @@ check_pid(){
 
 # 检查是否安装MTProxy
 check_installed_status(){
-    if [[ ! -e "${mtproxy_dir}" ]]; then
+    if [[ ! -e "${mtproxy_file}" ]]; then
         echo -e "${Error} MTProxy 没有安装，请检查 !"
         exit 1
     fi
