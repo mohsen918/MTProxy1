@@ -88,9 +88,9 @@ MODES = {
 # TLS_DOMAIN = "www.google.com"
 
 # 用于广告的标签，可从 @MTProxybot 获取
-# AD_TAG = "3c09c680b76ee91a4c25ad51f742267d"
-	EOF
-    }
+# AD_TAG = ""
+EOF
+}
 
 Write_Service(){
     echo -e "${Info} 开始写入 Service..."
@@ -109,9 +109,9 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
-	EOF
-        systemctl enable MTProxy
-    }
+EOF
+    systemctl enable MTProxy
+}
 
 Read_config(){
     [[ ! -e ${mtproxy_log} ]] && echo -e "${Error} MTProxy 配置文件不存在 !" && exit 1
@@ -154,7 +154,7 @@ Set_passwd(){
     read -e -p "(是否开启TLS伪装？[Y/n]):" mtp_tls
     [[ -z "${mtp_tls}" ]] && mtp_tls="Y"
     if [[ "${mtp_tls}" == [Yy] ]]; then
-        echo -e "${Tip} 请输入TLS伪装域名"
+        echo -e "${Tip} 请输入TLS伪装域名 ($Red无法使用被墙的域名。$Nc)"
         read -e -p "(默认：itunes.apple.com):" fake_domain
         [[ -z "${fake_domain}" ]] && fake_domain="itunes.apple.com"
         sed -i 's/^#\?.*secure.*/    "secure": False,/g' $mtproxy_conf
