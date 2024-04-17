@@ -157,15 +157,15 @@ Set_passwd(){
         echo -e "${Tip} 请输入TLS伪装域名"
         read -e -p "(默认：itunes.apple.com):" fake_domain
         [[ -z "${fake_domain}" ]] && fake_domain="itunes.apple.com"
-        sed -i 's/^#\?.*secure.*/    "secure": False,/g' /var/MTProxy/config.py
-        sed -i 's/^#\?.*tls.*/    "tls": True/g' /var/MTProxy/config.py
+        sed -i 's/^#\?.*secure.*/    "secure": False,/g' $mtproxy_conf
+        sed -i 's/^#\?.*tls.*/    "tls": True/g' $mtproxy_conf
         sed -i 's/^#\?.*TLS_DOMAIN.*/TLS_DOMAIN = "'"$fake_domain"'"/g' $mtproxy_conf
         echo && echo "========================"
         echo -e "  密匙 : ${Red_globa} ee${mtp_passwd}$(echo -n $fake_domain | od -A n -t x1 | tr -d ' ' | tr -d 'n') ${Nc}"
         echo "========================" && echo
     else
-        sed -i 's/^#\?.*secure.*/    "secure": True,/g' /var/MTProxy/config.py
-        sed -i 's/^#\?.*tls.*/    "tls": False/g' /var/MTProxy/config.py
+        sed -i 's/^#\?.*secure.*/    "secure": True,/g' $mtproxy_conf
+        sed -i 's/^#\?.*tls.*/    "tls": False/g' $mtproxy_conf
         echo && echo "========================"
         echo -e "  密匙 : ${Red_globa} dd${mtp_passwd} ${Nc}"
         echo "========================" && echo
