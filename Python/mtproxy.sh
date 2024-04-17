@@ -67,7 +67,7 @@ PORT = 443
 
 # 密匙 -> secret（32 个十六进制字符）
 USERS = {
-    "tg": "0123456789abcdef0123456789abcdef"
+    "tg": "0123456789abcdef0123456789abcdef",
 }
 
 MODES = {
