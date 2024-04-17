@@ -124,7 +124,7 @@ Read_config(){
 
 Set_port(){
     while true; do
-        echo -e "请输入 MTProxy 端口 [10000-65535]"
+        echo -e "${Tip} 请输入 MTProxy 端口 [10000-65535]"
         read -e -p "(默认：随机生成):" mtp_port
         [[ -z "${mtp_port}" ]] && mtp_port=$(shuf -i10000-65000 -n1)
         if [[ $? -eq 0 ]]; then
@@ -154,7 +154,7 @@ Set_passwd(){
     read -e -p "(是否开启TLS伪装？[Y/n]):" mtp_tls
     [[ -z "${mtp_tls}" ]] && mtp_tls="Y"
     if [[ "${mtp_tls}" == [Yy] ]]; then
-        echo -e "请输入TLS伪装域名"
+        echo -e "${Tip} 请输入TLS伪装域名"
         read -e -p "(默认：bing.com):" fake_domain
         [[ -z "${fake_domain}" ]] && fake_domain="bing.com"
         sed -i 's/^#\?.*secure.*/    "secure": False,/g' /var/MTProxy/config.py
@@ -173,7 +173,7 @@ Set_passwd(){
 }
 
 Set_tag(){
-    echo "请输入 MTProxy 的 TAG标签（TAG标签必须是32位，TAG标签只有在通过官方机器人 @MTProxybot 分享代理账号后才会获得，不清楚请留空回车）"
+    echo "${Tip} 请输入 MTProxy 的 TAG标签（TAG标签必须是32位，TAG标签只有在通过官方机器人 @MTProxybot 分享代理账号后才会获得，不清楚请留空回车）"
     read -e -p "(默认：回车跳过):" mtp_tag
     if [[ ! -z "${mtp_tag}" ]]; then
         echo && echo "========================"
