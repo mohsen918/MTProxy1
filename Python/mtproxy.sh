@@ -421,7 +421,7 @@ ${Green} 8.${Nc} 查看 MTProxy日志
         echo -e " 当前状态: ${Red}未安装${Nc}"
     fi
     echo
-    read -e -p " 请输入数字 [0-9]:" num
+    read -e -p " 请输入数字 [0-8]:" num
     case "$num" in
         0)
             Esc_Shell
