@@ -527,17 +527,6 @@ View_Log(){
     tail -f ${mtproxy_log}
 }
 
-get_IP_address(){
-    if [[ ! -z ${user_IP} ]]; then
-        for ((integer_1 = ${user_IP_total}; integer_1 >= 1; integer_1--)); do
-            IP=$(echo "${user_IP}" | sed -n "$integer_1"p)
-            IP_address=$(wget -qO- -t1 -T2 http://freeapi.ipip.net/${IP} | sed 's/\"//g;s/,//g;s/\[//g;s/\]//g')
-            echo -e "${Green}${IP}${Nc} (${IP_address})"
-            sleep 1s
-        done
-    fi
-}
-
 Esc_Shell(){
     exit 0
 }
