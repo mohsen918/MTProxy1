@@ -155,8 +155,8 @@ Set_passwd(){
     [[ -z "${mtp_tls}" ]] && mtp_tls="Y"
     if [[ "${mtp_tls}" == [Yy] ]]; then
         echo -e "${Tip} 请输入TLS伪装域名"
-        read -e -p "(默认：bing.com):" fake_domain
-        [[ -z "${fake_domain}" ]] && fake_domain="bing.com"
+        read -e -p "(默认：itunes.apple.com):" fake_domain
+        [[ -z "${fake_domain}" ]] && fake_domain="itunes.apple.com"
         sed -i 's/^#\?.*secure.*/    "secure": False,/g' /var/MTProxy/config.py
         sed -i 's/^#\?.*tls.*/    "tls": True/g' /var/MTProxy/config.py
         sed -i 's/^#\?TLS_DOMAIN.*/TLS_DOMAIN = "'"$fake_domain"'"/g' $mtproxy_conf
