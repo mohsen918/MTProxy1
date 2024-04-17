@@ -145,7 +145,7 @@ Set_port(){
 
 Set_passwd(){
     echo -e "${Tip} 请输入 MTProxy 密匙（普通密钥必须为32个十六进制字符，建议留空随机生成）"
-    read -e -p "(若需要开启TLS伪装建议直接回车):" mtp_passwd
+    read -e -p "(默认：随机生成):" mtp_passwd
     if [[ -z "${mtp_passwd}" ]]; then
         mtp_passwd=$(openssl rand -hex 16)
     fi
