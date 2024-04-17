@@ -116,9 +116,11 @@ WantedBy=multi-user.target
 
 Read_config(){
     [[ ! -e ${mtproxy_log} ]] && echo -e "${Error} MTProxy 配置文件不存在 !" && exit 1
-    IPv4=$(cat /var/MTProxy/log_mtproxy.log | grep 'server=' | cut -d'&' -f1 | cut -d'=' -f2)
-    PORT=$(cat /var/MTProxy/log_mtproxy.log | grep 'port=' | cut -d'&' -f2 | cut -d'=' -f2)
-    SECURE=$(cat /var/MTProxy/log_mtproxy.log | grep 'secret=' | cut -d'&' -f3 | cut -d'=' -f2)
+    IPv4=$(cat /var/MTProxy/log_mtproxy.log | grep 'server=' | cut -d'&' -f1 | cut -d'=' -f2 | grep -P '[.]')
+    IPv6=$(cat /var/MTProxy/log_mtproxy.log | grep 'server=' | cut -d'&' -f1 | cut -d'=' -f2 | grep -P '[:]')
+    PORT=$(cat /var/MTProxy/log_mtproxy.log | grep 'port=' | cut -d'&' -f2 | cut -d'=' -f2 | head -n 1)
+    SECURE=$(cat /var/MTProxy/log_mtproxy.log | grep 'secret=' | cut -d'&' -f3 | cut -d'=' -f2 | head -n 1)
+    TAG=$(cat /var/MTProxy/config.py | grep 'AD_TAG = ' | cut -d '"' -f2 | grep -v '^$')
 }
 
 Set_port(){
@@ -180,7 +182,7 @@ Set_tag(){
         echo "========================"
         sed -i 's/^#\?.*AD_TAG.*/AD_TAG = "'"$mtp_tag"'"/g' $mtproxy_conf
     else
-        sed -i 's/^#\?.*AD_TAG.*/# AD_TAG = "3c09c680b76ee91a4c25ad51f742267d"/g' $mtproxy_conf
+        sed -i 's/^#\?.*AD_TAG.*/# AD_TAG = ""/g' $mtproxy_conf
     fi
 }
 
@@ -216,7 +218,6 @@ ${Green}4.${Nc}  修改 全部配置" && echo
 Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
     install_base
-    vps_info
     Download
     Set_port
     Set_passwd
@@ -350,14 +351,14 @@ View(){
     echo -e "Mtproto Proxy 用户配置："
     echo -e "————————————————"
     echo -e " 地址\t: ${Green}${IPv4}${Nc}"
-    [[ ! -z "${nat_ipv6}" ]] && echo -e " 地址\t: ${Green}${nat_ipv6}${Nc}"
+    [[ ! -z "${IPv6}" ]] && echo -e " 地址\t: ${Green}${IPv6}${Nc}"
     echo -e " 端口\t: ${Green}${PORT}${Nc}"
     echo -e " 密匙\t: ${Green}${SECURE}${Nc}"
-    [[ ! -z "${tag}" ]] && echo -e " TAG \t: ${Green}${tag}${Nc}"
+    [[ ! -z "${TAG}" ]] && echo -e " TAG \t: ${Green}${TAG}${Nc}"
     echo -e " 链接\t: ${Red}tg://proxy?server=${IPv4}&port=${PORT}&secret=${SECURE}${Nc}"
     echo -e " 链接\t: ${Red}https://t.me/proxy?server=${IPv4}&port=${PORT}&secret=${SECURE}${Nc}"
-    [[ ! -z "${nat_ipv6}" ]] && echo -e " 链接\t: ${Red}tg://proxy?server=${nat_ipv6}&port=${port}&secret=${secure}${Nc}"
-    [[ ! -z "${nat_ipv6}" ]] && echo -e " 链接\t: ${Red}https://t.me/proxy?server=${nat_ipv6}&port=${port}&secret=${secure}${Nc}"
+    [[ ! -z "${IPv6}" ]] && echo -e " 链接\t: ${Red}tg://proxy?server=${IPv6}&port=${PORT}&secret=${SECURE}${Nc}"
+    [[ ! -z "${IPv6}" ]] && echo -e " 链接\t: ${Red}https://t.me/proxy?server=${IPv6}&port=${PORT}&secret=${SECURE}${Nc}"
     echo
     echo -e "${Red}注意\t:${Nc} 密匙头部的 ${Green}dd${Nc} 字符是代表客户端启用${Green}安全混淆模式${Nc}（TLS伪装模式除外），可以降低服务器被墙几率。"
     backmenu
@@ -368,17 +369,6 @@ View_Log(){
     [[ ! -e ${mtproxy_log} ]] && echo -e "${Error} MTProxy 日志文件不存在 !" && exit 1
     echo && echo -e "${Tip} 按 ${Red}Ctrl+C${Nc} 终止查看日志。"
     tail -f ${mtproxy_log}
-}
-
-get_IP_address(){
-    if [[ ! -z ${user_IP} ]]; then
-        for ((integer_1 = ${user_IP_total}; integer_1 >= 1; integer_1--)); do
-            IP=$(echo "${user_IP}" | sed -n "$integer_1"p)
-            IP_address=$(wget -qO- -t1 -T2 http://freeapi.ipip.net/${IP} | sed 's/\"//g;s/,//g;s/\[//g;s/\]//g')
-            echo -e "${Green}${IP}${Nc} (${IP_address})"
-            sleep 1s
-        done
-    fi
 }
 
 Esc_Shell(){
@@ -421,7 +411,8 @@ ${Green} 8.${Nc} 查看 MTProxy日志
             echo -e " 当前状态: ${Green}已安装${Nc} 并 ${Green}已启动${Nc}"
             check_installed_status
             Read_config
-            echo -e "${Info}MTProxy 链接: ${Red}https://t.me/proxy?server=${IPv4}&port=${PORT}&secret=${SECURE}${Nc}"
+            echo -e "${Info}IPv4 链接: ${Red}https://t.me/proxy?server=${IPv4}&port=${PORT}&secret=${SECURE}${Nc}"
+            [[ ! -z "${IPv6}" ]] && echo -e "${Info}IPv6 链接: ${Red}https://t.me/proxy?server=${IPv6}&port=${PORT}&secret=${SECURE}${Nc}"
         else
             echo -e " 当前状态: ${Green}已安装${Nc} 但 ${Red}未启动${Nc}"
         fi
