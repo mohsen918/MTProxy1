@@ -217,7 +217,7 @@ ${Green}4.${Nc}  修改 全部配置" && echo
 Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
     vps_info
-	install_base
+    install_base
     Download
     Set_port
     Set_passwd
@@ -360,6 +360,7 @@ View(){
     [[ ! -z "${IPv6}" ]] && echo -e " 链接\t: ${Red}tg://proxy?server=${IPv6}&port=${PORT}&secret=${SECURE}${Nc}"
     [[ ! -z "${IPv6}" ]] && echo -e " 链接\t: ${Red}https://t.me/proxy?server=${IPv6}&port=${PORT}&secret=${SECURE}${Nc}"
     echo
+    echo -e "${Red}注意\t:${Nc} 密匙头部的 ${Green}ee${Nc} 字符是代表客户端启用${Green}TLS伪装模式${Nc} ，可以降低服务器被墙几率。"
     echo -e "${Red}注意\t:${Nc} 密匙头部的 ${Green}dd${Nc} 字符是代表客户端启用${Green}安全混淆模式${Nc}（TLS伪装模式除外），可以降低服务器被墙几率。"
     backmenu
 }
