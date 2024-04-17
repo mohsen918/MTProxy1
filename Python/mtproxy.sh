@@ -110,7 +110,7 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 	EOF
-        systemctl enable mtproxy
+        systemctl enable MTProxy
     }
 
 Read_config(){
@@ -159,7 +159,7 @@ Set_passwd(){
         [[ -z "${fake_domain}" ]] && fake_domain="itunes.apple.com"
         sed -i 's/^#\?.*secure.*/    "secure": False,/g' /var/MTProxy/config.py
         sed -i 's/^#\?.*tls.*/    "tls": True/g' /var/MTProxy/config.py
-        sed -i 's/^#\?TLS_DOMAIN.*/TLS_DOMAIN = "'"$fake_domain"'"/g' $mtproxy_conf
+        sed -i 's/^#\?.*TLS_DOMAIN.*/TLS_DOMAIN = "'"$fake_domain"'"/g' $mtproxy_conf
         echo && echo "========================"
         echo -e "  密匙 : ${Red_globa} ee${mtp_passwd}$(echo -n $fake_domain | od -A n -t x1 | tr -d ' ' | tr -d 'n') ${Nc}"
         echo "========================" && echo
@@ -173,7 +173,7 @@ Set_passwd(){
 }
 
 Set_tag(){
-    echo "${Tip} 请输入 MTProxy 的 TAG标签（TAG标签必须是32位，TAG标签只有在通过官方机器人 @MTProxybot 分享代理账号后才会获得，不清楚请留空回车）"
+    echo -e "${Tip} 请输入 MTProxy 的 TAG标签（TAG标签必须是32位，TAG标签只有在通过官方机器人 @MTProxybot 分享代理账号后才会获得，不清楚请留空回车）"
     read -e -p "(默认：回车跳过):" mtp_tag
     if [[ ! -z "${mtp_tag}" ]]; then
         echo && echo "========================"
@@ -217,7 +217,7 @@ ${Green}4.${Nc}  修改 全部配置" && echo
 Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
     vps_info
-    install_base
+	install_base
     Download
     Set_port
     Set_passwd
@@ -262,10 +262,10 @@ Restart(){
     check_installed_status
     check_pid
     if [[ ! -z ${PID} ]]; then
-        systemctl stop mtproxy
+        systemctl stop MTProxy.service
         sleep 1s
     fi
-    systemctl start mtproxy
+    systemctl start MTProxy.service
     sleep 1s
     check_pid
     [[ ! -z ${PID} ]] && View
@@ -280,9 +280,9 @@ Uninstall(){
     if [[ ${unyn} == [Yy] ]]; then
         check_pid
         if [[ ! -z $PID ]]; then
-            systemctl stop mtproxy
+            systemctl stop MTProxy.service
         fi
-        systemctl disable mtproxy
+        systemctl disable MTProxy.service
         rm -rf ${mtproxy_dir}  /lib/systemd/system/MTProxy.service
         echo
         echo "MTProxy 卸载完成 !"
