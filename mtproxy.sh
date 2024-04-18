@@ -21,7 +21,7 @@ Old_ver_file="${mtproxy_dir}/ver.txt"
 
 # 检查是否为root用户
 check_root(){
-    if [[ $(whoami) != "root" ]]; then
+    if [ "$(id -u)" != "0" ]; then
         echo -e "${Error} 当前非ROOT账号(或没有ROOT权限)，无法继续操作，请更换ROOT账号或使用 ${Green_globa}sudo -i${Nc} 命令获取临时ROOT权限（执行后可能会提示输入当前账号的密码）。"
         exit 1
     fi
