@@ -80,22 +80,27 @@ check_pmc(){
     if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "kali" ]]; then
         updates="apt update -y"
         installs="apt install -y"
+        check_install="dpkg -s"
         apps=("python3" "python3-pyaes" "python3-cryptography")
     elif [[ "$release" == "almalinux" || "$release" == "fedora" || "$release" == "rocky" ]]; then
         updates="dnf update -y"
         installs="dnf install -y"
+        check_install="dnf list installed"
         apps=("python3" "python3-pyaes" "python3-cryptography")
     elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
         updates="yum update -y"
         installs="yum install -y"
+        check_install="rpm -q"
         apps=("python3" "python3-pyaes" "python3-cryptography")
     elif [[ "$release" == "arch" ]]; then
         updates="pacman -Syu --noconfirm"
         installs="pacman -S --noconfirm"
+        check_install="pacman -Q"
         apps=("python" "python-pyaes" "python-cryptography")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update"
         installs="apk add"
+        check_install="apk info"
         apps=("python3" "py3-pyaes" "py3-cryptography")
     fi
 }
@@ -107,18 +112,10 @@ install_base(){
     declare -A python_module_names=( ["python3-pyaes"]="pyaes" ["python3-cryptography"]="cryptography" )
     for i in "${apps[@]}"
     do
-        if [[ $i == "python3" ]]
+        if ! $check_install $i &> /dev/null
         then
-            if ! command -v python3 &> /dev/null
-            then
-               $installs $i
-            fi
-        else
-            python_module_name=${python_module_names[$i]}
-            if ! python3 -c "import $python_module_name" &> /dev/null
-            then
-                $installs $i
-            fi
+            echo -e "${Tip} $i 未安装。开始安装..."
+            $installs $i
         fi
     done
 }
