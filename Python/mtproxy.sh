@@ -110,11 +110,10 @@ Description=MTProxy
 After=network.target
 
 [Service]
-Type=simple
+User=root
+Group=root
 WorkingDirectory=/var/MTProxy
 ExecStart=python3 /var/MTProxy/mtproxy.py
-StandardOutput=file:/var/MTProxy/log_mtproxy.log
-StandardError=file:/var/MTProxy/log_mtproxy.log
 Restart=always
 
 [Install]
