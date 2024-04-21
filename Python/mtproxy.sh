@@ -382,9 +382,8 @@ View(){
 
 View_Log(){
     check_installed_status
-    [[ ! -e ${mtproxy_log} ]] && echo -e "${Error} MTProxy 日志文件不存在 !" && exit 1
+    journalctl -u MTProxy -f
     echo && echo -e "${Tip} 按 ${Red}Ctrl+C${Nc} 终止查看日志。"
-    tail -f ${mtproxy_log}
 }
 
 Esc_Shell(){
