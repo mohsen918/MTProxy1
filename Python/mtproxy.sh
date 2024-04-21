@@ -85,7 +85,7 @@ check_pmc(){
         updates="dnf update -y"
         installs="dnf install -y"
         check_install="dnf list installed"
-        apps=("python3" "python3-cryptography" "vim-common")
+        apps=("python3.11" "python3.11-cryptography" "vim-common")
     elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
         updates="yum update -y"
         installs="yum install -y"
