@@ -108,6 +108,7 @@ install_base(){
         if ! $check_install $i &> /dev/null
         then
             echo -e "${Tip} $i 未安装。正在安装..."
+            $updates
             $installs $i
         fi
     done
