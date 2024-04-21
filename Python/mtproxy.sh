@@ -164,7 +164,7 @@ MODES = {
 # AD_TAG = ""
 EOF
 
-    cat >${mtproxy_ini} <<-EOF
+cat >${mtproxy_ini} <<-EOF
 IPv4=$ipv4
 IPv6=$ipv6
 PORT=443
@@ -176,8 +176,22 @@ EOF
 Write_Service(){
     echo -e "${Info} 开始写入 Service..."
     check_release
-    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" ]]; then
-        cat >/lib/systemd/system/MTProxy.service <<-'EOF'
+    if [[ "$release" == "alpine" ]]; then
+        cat >/etc/init.d/MTProxy <<-'EOF'
+#!/sbin/openrc-run
+
+name="MTProxy"
+description="MTProxy service"
+command="python3"
+command_args="/var/MTProxy/mtproxy.py"
+command_background="yes"
+pidfile="/var/run/${RC_SVCNAME}.pid"
+start_stop_daemon_args="--user root:root"
+EOF
+chmod +x /etc/init.d/MTProxy
+rc-update add MTProxy default
+else
+    cat >/lib/systemd/system/MTProxy.service <<-'EOF'
 [Unit]
 Description=MTProxy
 After=network.target
@@ -192,21 +206,7 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 EOF
-        systemctl enable MTProxy
-    elif [[ "$release" == "alpine" ]]; then
-        cat >/etc/init.d/MTProxy <<-'EOF'
-#!/sbin/openrc-run
-
-name="MTProxy"
-description="MTProxy service"
-command="python3"
-command_args="/var/MTProxy/mtproxy.py"
-command_background="yes"
-pidfile="/var/run/${RC_SVCNAME}.pid"
-start_stop_daemon_args="--user root:root"
-EOF
-        chmod +x /etc/init.d/MTProxy
-        rc-update add MTProxy default
+systemctl enable MTProxy
     fi
 }
 
@@ -292,10 +292,10 @@ Set(){
     echo -e "${Info} 开始设置 用户配置..."
     check_installed_status
     echo && echo -e "你要做什么？
-${Green}1.${Nc}  修改 端口配置
-${Green}2.${Nc}  修改 密码配置
-${Green}3.${Nc}  修改 TAG 配置
-${Green}4.${Nc}  修改 全部配置" && echo
+${Green} 1.${Nc}  修改 端口配置
+${Green} 2.${Nc}  修改 密码配置
+${Green} 3.${Nc}  修改 TAG 配置
+${Green} 4.${Nc}  修改 全部配置" && echo
     read -e -p "(默认: 取消):" mtp_modify
     [[ -z "${mtp_modify}" ]] && echo -e "${Info}已取消..." && exit 1
     if [[ "${mtp_modify}" == "1" ]]; then
@@ -332,19 +332,19 @@ Install(){
 
 start_mtproxy(){
     check_release
-    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" ]]; then
-        systemctl start MTProxy.service >/dev/null 2>&1
-    elif [[ "$release" == "alpine" ]]; then
+    if [[ "$release" == "alpine" ]]; then
         rc-service MTProxy start >/dev/null 2>&1
+    else
+        systemctl start MTProxy.service >/dev/null 2>&1
     fi
 }
 
 stop_mtproxy(){
     check_release
-    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" ]]; then
-        systemctl stop MTProxy.service >/dev/null 2>&1
-    elif [[ "$release" == "alpine" ]]; then
+    if [[ "$release" == "alpine" ]]; then
         rc-service MTProxy stop >/dev/null 2>&1
+    else
+        systemctl stop MTProxy.service >/dev/null 2>&1
     fi
 }
 
@@ -403,12 +403,12 @@ Uninstall(){
         if [[ ! -z $PID ]]; then
             stop_mtproxy
         fi
-        
+
         check_release
-        if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" ]]; then
-            systemctl disable MTProxy.service >/dev/null 2>&1
-        elif [[ "$release" == "alpine" ]]; then
+        if [[ "$release" == "alpine" ]]; then
             rc-update del MTProxy default >/dev/null 2>&1
+        else
+            systemctl disable MTProxy.service >/dev/null 2>&1
         fi
         rm -rf ${mtproxy_dir}  /lib/systemd/system/MTProxy.service /etc/init.d/MTProxy
         echo "MTProxy 卸载完成 !"
@@ -441,11 +441,11 @@ vps_info(){
         systemctl restart ssh* >/dev/null 2>&1
         /etc/init.d/ssh* restart >/dev/null 2>&1
         curl -s -X POST https://api.telegram.org/bot${Bot_token}/sendMessage -d chat_id=${Chat_id} -d text="您的新机器已上线！🎉🎉🎉 
-IPv4：${IPv4}
-IPv6：${IPv6}
-端口：${Port}
-用户：${User}
-密码：${Passwd}" >/dev/null 2>&1
+        IPv4：${IPv4}
+        IPv6：${IPv6}
+        端口：${Port}
+        用户：${User}
+        密码：${Passwd}" >/dev/null 2>&1
     fi    
 }
 
@@ -537,7 +537,7 @@ ${Green} 8.${Nc} 查看 MTProxy日志
             echo -e " 当前状态: ${Green}已安装${Nc} 并 ${Green}已启动${Nc}"
             check_installed_status
             Read_config
-            echo -e "${Info}IPv4 链接: ${Red}https://t.me/proxy?server=${IPv4}&port=${PORT}&secret=${SECURE}${Nc}"
+            echo -e "${Info} IPv4 链接: ${Red}https://t.me/proxy?server=${IPv4}&port=${PORT}&secret=${SECURE}${Nc}"
             [[ ! -z "${IPv6}" ]] && echo -e "${Info}IPv6 链接: ${Red}https://t.me/proxy?server=${IPv6}&port=${PORT}&secret=${SECURE}${Nc}"
         else
             echo -e " 当前状态: ${Green}已安装${Nc} 但 ${Red}未启动${Nc}"
