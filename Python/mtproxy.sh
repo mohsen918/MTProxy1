@@ -79,22 +79,22 @@ check_pmc(){
         updates="apt update -y"
         installs="apt install -y"
         check_install="dpkg -s"
-        apps=("python3" "python3-pyaes" "python3-cryptography")
+        apps=("python3" "python3-cryptography")
     elif [[ "$release" == "almalinux" || "$release" == "fedora" || "$release" == "rocky" ]]; then
         updates="dnf update -y"
         installs="dnf install -y"
         check_install="dnf list installed"
-        apps=("python3" "python3-pyaes" "python3-cryptography")
+        apps=("python3" "python3-cryptography")
     elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
         updates="yum update -y"
         installs="yum install -y"
         check_install="rpm -q"
-        apps=("python3" "python3-pyaes" "python3-cryptography")
+        apps=("python3" "python3-cryptography")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update"
         installs="apk add"
         check_install="apk info -e"
-        apps=("python3" "py3-pyaes" "py3-cryptography")
+        apps=("python3" "py3-cryptography")
     fi
 }
 
@@ -102,7 +102,6 @@ install_base(){
     check_pmc
     echo -e "${Info} 你的系统是${Red} $release $os_version ${Nc}"
     echo
-    declare -A python_module_names=( ["python3-pyaes"]="pyaes" ["python3-cryptography"]="cryptography" )
     for i in "${apps[@]}"
     do
         if ! $check_install $i &> /dev/null
@@ -321,7 +320,6 @@ Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
     install_base
     Download
-    vps_info
     Set_port
     Set_passwd
     Set_tag
