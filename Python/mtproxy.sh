@@ -63,7 +63,6 @@ check_release(){
         echo -e "-${Red} Debian ${Nc}"
         echo -e "-${Red} CentOS ${Nc}"
         echo -e "-${Red} Fedora ${Nc}"
-        echo -e "-${Red} Arch Linux ${Nc}"
         echo -e "-${Red} Kali ${Nc}"
         echo -e "-${Red} AlmaLinux ${Nc}"
         echo -e "-${Red} Rocky Linux ${Nc}"
@@ -175,7 +174,7 @@ EOF
 Write_Service(){
     echo -e "${Info} 开始写入 Service..."
     check_release
-    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" || "$release" == "arch" ]]; then
+    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" ]]; then
         cat >/lib/systemd/system/MTProxy.service <<-'EOF'
 [Unit]
 Description=MTProxy
@@ -330,7 +329,7 @@ Install(){
 
 start_mtproxy(){
     check_release
-    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" || "$release" == "arch" ]]; then
+    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" ]]; then
         systemctl start MTProxy.service >/dev/null 2>&1
     elif [[ "$release" == "alpine" ]]; then
         rc-service MTProxy start >/dev/null 2>&1
@@ -339,7 +338,7 @@ start_mtproxy(){
 
 stop_mtproxy(){
     check_release
-    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" || "$release" == "arch" ]]; then
+    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" ]]; then
         systemctl stop MTProxy.service >/dev/null 2>&1
     elif [[ "$release" == "alpine" ]]; then
         rc-service MTProxy stop >/dev/null 2>&1
@@ -403,7 +402,7 @@ Uninstall(){
         fi
         
         check_release
-        if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" || "$release" == "arch" ]]; then
+        if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" ]]; then
             systemctl disable MTProxy.service >/dev/null 2>&1
         elif [[ "$release" == "alpine" ]]; then
             rc-update del MTProxy default >/dev/null 2>&1
