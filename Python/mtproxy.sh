@@ -87,7 +87,7 @@ check_pmc(){
     elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
         updates="yum update -y"
         installs="yum install -y"
-        check_install="rpm -q"
+        check_install="yum list installed"
         apps=("python3" "python3-cryptography" "vim-common")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update"
