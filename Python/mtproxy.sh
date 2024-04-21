@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 Red="\033[31m" # 红色
@@ -81,40 +80,47 @@ check_pmc(){
     if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "kali" ]]; then
         updates="apt update -y"
         installs="apt install -y"
-        apps=("python3" "python3-pip")
+        apps=("python3" "python3-pyaes" "python3-cryptography")
     elif [[ "$release" == "almalinux" || "$release" == "fedora" || "$release" == "rocky" ]]; then
         updates="dnf update -y"
         installs="dnf install -y"
-        apps=("python3" "python3-pip")
+        apps=("python3" "python3-pyaes" "python3-cryptography")
     elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
         updates="yum update -y"
         installs="yum install -y"
-        apps=("python3" "python3-pip")
+        apps=("python3" "python3-pyaes" "python3-cryptography")
     elif [[ "$release" == "arch" ]]; then
         updates="pacman -Syu --noconfirm"
         installs="pacman -S --noconfirm"
-        apps=("python3" "python3-pip")
+        apps=("python" "python-pyaes" "python-cryptography")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update"
         installs="apk add"
-        apps=("python3" "python3-pip")
+        apps=("python3" "py3-pyaes" "py3-cryptography")
     fi
 }
 
 install_base(){
     check_pmc
-    echo -e "${Info}你的系统是${Red} $release $os_version ${Nc}"
+    echo -e "${Info} 你的系统是${Red} $release $os_version ${Nc}"
     echo
-    commands=("python3" "pip3")
-    install=()
-    for i in ${!commands[@]}; do
-        [ ! $(command -v ${commands[i]}) ] && install+=(${apps[i]})
+    declare -A python_module_names=( ["python3-pyaes"]="pyaes" ["python3-cryptography"]="cryptography" )
+    for i in "${apps[@]}"
+    do
+        if [[ $i == "python3" ]]
+        then
+            if ! command -v python3 &> /dev/null
+            then
+               $installs $i
+            fi
+        else
+            python_module_name=${python_module_names[$i]}
+            if ! python3 -c "import $python_module_name" &> /dev/null
+            then
+                $installs $i
+            fi
+        fi
     done
-    [ "${#install[@]}" -gt 0 ] && $updates && $installs ${install[@]}
-
-    if [[ -z $(pip3 freeze | grep 'pyaes') ]] || [[ -z $(pip3 freeze | grep 'cryptography') ]]; then
-        pip3 install pyaes cryptography
-    fi
 }
 
 check_pid(){
@@ -178,7 +184,9 @@ EOF
 
 Write_Service(){
     echo -e "${Info} 开始写入 Service..."
-    cat >/lib/systemd/system/MTProxy.service <<-'EOF'
+    check_release
+    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" || "$release" == "arch" ]]; then
+        cat >/lib/systemd/system/MTProxy.service <<-'EOF'
 [Unit]
 Description=MTProxy
 After=network.target
@@ -193,7 +201,22 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 EOF
-    systemctl enable MTProxy
+        systemctl enable MTProxy
+    elif [[ "$release" == "alpine" ]]; then
+        cat >/etc/init.d/MTProxy <<-'EOF'
+#!/sbin/openrc-run
+
+name="MTProxy"
+description="MTProxy service"
+command="python3"
+command_args="/var/MTProxy/mtproxy.py"
+command_background="yes"
+pidfile="/var/run/${RC_SVCNAME}.pid"
+start_stop_daemon_args="--user root:root"
+EOF
+        chmod +x /etc/init.d/MTProxy
+        rc-update add MTProxy default
+    fi
 }
 
 Read_config(){
@@ -315,6 +338,24 @@ Install(){
     Start
 }
 
+start_mtproxy(){
+    check_release
+    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" || "$release" == "arch" ]]; then
+        systemctl start MTProxy.service >/dev/null 2>&1
+    elif [[ "$release" == "alpine" ]]; then
+        rc-service MTProxy start >/dev/null 2>&1
+    fi
+}
+
+stop_mtproxy(){
+    check_release
+    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" || "$release" == "arch" ]]; then
+        systemctl stop MTProxy.service >/dev/null 2>&1
+    elif [[ "$release" == "alpine" ]]; then
+        rc-service MTProxy stop >/dev/null 2>&1
+    fi
+}
+
 Start(){
     check_installed_status
     check_pid
@@ -323,7 +364,7 @@ Start(){
         sleep 1s
         menu
     else
-        systemctl start MTProxy.service
+        start_mtproxy
         sleep 1s
         check_pid
         if [[ ! -z ${PID} ]]; then
@@ -340,7 +381,7 @@ Stop(){
         sleep 1s
         menu
     else
-        systemctl stop MTProxy.service
+        stop_mtproxy
         sleep 1s
         menu
     fi
@@ -350,10 +391,10 @@ Restart(){
     check_installed_status
     check_pid
     if [[ ! -z ${PID} ]]; then
-        systemctl stop MTProxy.service
+        stop_mtproxy
         sleep 1s
     fi
-    systemctl start MTProxy.service
+    start_mtproxy
     sleep 1s
     check_pid
     [[ ! -z ${PID} ]] && View
@@ -368,11 +409,16 @@ Uninstall(){
     if [[ ${unyn} == [Yy] ]]; then
         check_pid
         if [[ ! -z $PID ]]; then
-            systemctl stop MTProxy.service
+            stop_mtproxy
         fi
-        systemctl disable MTProxy.service
-        rm -rf ${mtproxy_dir}  /lib/systemd/system/MTProxy.service
-        echo
+        
+        check_release
+        if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "centos" || "$release" == "fedora" || "$release" == "almalinux" || "$release" == "rocky" || "$release" == "oracle" || "$release" == "kali" || "$release" == "arch" ]]; then
+            systemctl disable MTProxy.service >/dev/null 2>&1
+        elif [[ "$release" == "alpine" ]]; then
+            rc-update del MTProxy default >/dev/null 2>&1
+        fi
+        rm -rf ${mtproxy_dir}  /lib/systemd/system/MTProxy.service /etc/init.d/MTProxy
         echo "MTProxy 卸载完成 !"
         echo
     else
