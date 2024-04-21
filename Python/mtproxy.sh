@@ -88,7 +88,7 @@ check_pmc(){
         updates="yum update -y"
         installs="yum install -y"
         check_install="yum list installed"
-        apps=("python3" "python3-cryptography" "vim-common")
+        apps=("python38" "python38-cryptography" "vim-common")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update"
         installs="apk add"
@@ -319,6 +319,7 @@ Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
     install_base
     Download
+    vps_info
     Set_port
     Set_passwd
     Set_tag
