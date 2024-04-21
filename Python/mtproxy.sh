@@ -382,8 +382,8 @@ View(){
 
 View_Log(){
     check_installed_status
-    journalctl -u MTProxy -f
     echo && echo -e "${Tip} 按 ${Red}Ctrl+C${Nc} 终止查看日志。"
+    journalctl -u MTProxy -f
 }
 
 Esc_Shell(){
