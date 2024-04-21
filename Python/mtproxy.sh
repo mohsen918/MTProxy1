@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 Red="\033[31m" # 红色
@@ -28,18 +29,91 @@ check_root(){
     fi
 }
 
-# 安装依赖
-install_base(){
-    OS=$(cat /etc/os-release | grep -o -E "Debian|Ubuntu|CentOS" | head -n 1)
-    if [[ "$OS" == "Debian" || "$OS" == "Ubuntu" ]]; then
-        if ! pip3 freeze | grep 'pyaes' &>/dev/null || ! pip3 freeze | grep 'cryptography' &>/dev/null; then
-            echo -e "${Info} 开始安装/配置 依赖..."
-            apt update -y
-            apt install -y iproute2 python3 python3-pip python3-cryptography python3-pyaes openssl
-        fi
+check_release(){
+    if [[ -e /etc/os-release ]]; then
+        . /etc/os-release
+        release=$ID
+    elif [[ -e /usr/lib/os-release ]]; then
+        . /usr/lib/os-release
+        release=$ID
+    fi
+    os_version=$(echo $VERSION_ID | cut -d. -f1,2)
+
+    if [[ "${release}" == "arch" ]]; then
+        echo
+    elif [[ "${release}" == "kali" ]]; then
+        echo
+    elif [[ "${release}" == "centos" ]]; then
+        echo
+    elif [[ "${release}" == "ubuntu" ]]; then
+        echo
+    elif [[ "${release}" == "fedora" ]]; then
+        echo
+    elif [[ "${release}" == "debian" ]]; then
+        echo
+    elif [[ "${release}" == "almalinux" ]]; then
+        echo
+    elif [[ "${release}" == "rocky" ]]; then
+        echo
+    elif [[ "${release}" == "oracle" ]]; then
+        echo
+    elif [[ "${release}" == "alpine" ]]; then
+        echo
     else
-        echo -e "${Error} 很抱歉，你的系统不受支持！"
+        echo -e "${Error} 抱歉，此脚本不支持您的操作系统。"
+        echo -e "${Info} 请确保您使用的是以下支持的操作系统之一："
+        echo -e "-${Red} Ubuntu${Nc} "
+        echo -e "-${Red} Debian ${Nc}"
+        echo -e "-${Red} CentOS ${Nc}"
+        echo -e "-${Red} Fedora ${Nc}"
+        echo -e "-${Red} Arch Linux ${Nc}"
+        echo -e "-${Red} Kali ${Nc}"
+        echo -e "-${Red} AlmaLinux ${Nc}"
+        echo -e "-${Red} Rocky Linux ${Nc}"
+        echo -e "-${Red} Oracle Linux ${Nc}"
+        echo -e "-${Red} Alpine Linux ${Nc}"
         exit 1
+    fi
+}
+
+check_pmc(){
+    check_release
+    if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "kali" ]]; then
+        updates="apt update -y"
+        installs="apt install -y"
+        apps=("python3" "python3-pip")
+    elif [[ "$release" == "almalinux" || "$release" == "fedora" || "$release" == "rocky" ]]; then
+        updates="dnf update -y"
+        installs="dnf install -y"
+        apps=("python3" "python3-pip")
+    elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
+        updates="yum update -y"
+        installs="yum install -y"
+        apps=("python3" "python3-pip")
+    elif [[ "$release" == "arch" ]]; then
+        updates="pacman -Syu --noconfirm"
+        installs="pacman -S --noconfirm"
+        apps=("python3" "python3-pip")
+    elif [[ "$release" == "alpine" ]]; then
+        updates="apk update"
+        installs="apk add"
+        apps=("python3" "python3-pip")
+    fi
+}
+
+install_base(){
+    check_pmc
+    echo -e "${Info}你的系统是${Red} $release $os_version ${Nc}"
+    echo
+    commands=("python3" "python3-pip")
+    install=()
+    for i in ${!commands[@]}; do
+        [ ! $(command -v ${commands[i]}) ] && install+=(${apps[i]})
+    done
+    [ "${#install[@]}" -gt 0 ] && $updates && $installs ${install[@]}
+
+    if [[ -z $(pip3 freeze | grep 'pyaes') ]] || [[ -z $(pip3 freeze | grep 'cryptography') ]]; then
+        pip3 install pyaes cryptography
     fi
 }
 
@@ -231,7 +305,6 @@ ${Green}4.${Nc}  修改 全部配置" && echo
 
 Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
-    vps_info
     install_base
     Download
     Set_port
