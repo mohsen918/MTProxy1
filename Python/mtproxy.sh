@@ -38,9 +38,7 @@ check_release(){
     fi
     os_version=$(echo $VERSION_ID | cut -d. -f1,2)
 
-    if [[ "${release}" == "arch" ]]; then
-        echo
-    elif [[ "${release}" == "kali" ]]; then
+    if [[ "${release}" == "kali" ]]; then
         echo
     elif [[ "${release}" == "centos" ]]; then
         echo
@@ -92,15 +90,10 @@ check_pmc(){
         installs="yum install -y"
         check_install="rpm -q"
         apps=("python3" "python3-pyaes" "python3-cryptography")
-    elif [[ "$release" == "arch" ]]; then
-        updates="pacman -Syu --noconfirm"
-        installs="pacman -S --noconfirm"
-        check_install="pacman -Q"
-        apps=("python" "python-pyaes" "python-cryptography")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update"
         installs="apk add"
-        check_install="apk info"
+        check_install="apk info -e"
         apps=("python3" "py3-pyaes" "py3-cryptography")
     fi
 }
@@ -114,7 +107,7 @@ install_base(){
     do
         if ! $check_install $i &> /dev/null
         then
-            echo -e "${Tip} $i 未安装。开始安装..."
+            echo "$i 未安装。正在安装..."
             $installs $i
         fi
     done
