@@ -78,22 +78,22 @@ check_pmc(){
         updates="apt update -y"
         installs="apt install -y"
         check_install="dpkg -s"
-        apps=("python3" "python3-cryptography")
+        apps=("python3" "python3-cryptography" "vim")
     elif [[ "$release" == "almalinux" || "$release" == "fedora" || "$release" == "rocky" ]]; then
         updates="dnf update -y"
         installs="dnf install -y"
         check_install="dnf list installed"
-        apps=("python3" "python3-cryptography")
+        apps=("python3" "python3-cryptography" "vim")
     elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
         updates="yum update -y"
         installs="yum install -y"
         check_install="rpm -q"
-        apps=("python3" "python3-cryptography")
+        apps=("python3" "python3-cryptography" "vim")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update"
         installs="apk add"
         check_install="apk info -e"
-        apps=("python3" "py3-cryptography")
+        apps=("python3" "py3-cryptography" "vim")
     fi
 }
 
