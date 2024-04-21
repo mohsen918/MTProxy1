@@ -182,8 +182,8 @@ Write_Service(){
 
 name="MTProxy"
 description="MTProxy service"
-command="python3"
-command_args="/var/MTProxy/mtproxy.py"
+command="/bin/sh"
+command_args="-c 'python3 /var/MTProxy/mtproxy.py > /var/MTProxy/log_mtproxy.log'"
 command_background="yes"
 pidfile="/var/run/${RC_SVCNAME}.pid"
 start_stop_daemon_args="--user root:root"
@@ -493,8 +493,13 @@ View(){
 
 View_Log(){
     check_installed_status
+    check_release
     echo && echo -e "${Tip} 按 ${Red}Ctrl+C${Nc} 终止查看日志。"
-    journalctl -u MTProxy -f
+    if [[ "$release" == "alpine" ]]; then
+        tail -f /var/MTProxy/log_mtproxy.log
+    else
+        journalctl -u MTProxy -f
+    fi
 }
 
 Esc_Shell(){
