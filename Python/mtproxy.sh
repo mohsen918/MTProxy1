@@ -41,7 +41,9 @@ check_release(){
     if [[ "${release}" == "kali" ]]; then
         echo
     elif [[ "${release}" == "centos" ]]; then
-        echo
+        if [[ ${os_version} -lt 8 ]]; then
+            echo -e " ${Error} 请使用${Red} CentOS 8${Nc} 或更高版本" && exit 1
+        fi
     elif [[ "${release}" == "ubuntu" ]]; then
         echo
     elif [[ "${release}" == "fedora" ]]; then
@@ -61,7 +63,7 @@ check_release(){
         echo -e "${Info} 请确保您使用的是以下支持的操作系统之一："
         echo -e "-${Red} Ubuntu${Nc} "
         echo -e "-${Red} Debian ${Nc}"
-        echo -e "-${Red} CentOS ${Nc}"
+        echo -e "-${Red} CentOS 8+ ${Nc}"
         echo -e "-${Red} Fedora ${Nc}"
         echo -e "-${Red} Kali ${Nc}"
         echo -e "-${Red} AlmaLinux ${Nc}"
@@ -319,7 +321,6 @@ Install(){
     [[ -e ${mtproxy_file} ]] && echo -e "${Error} 检测到 MTProxy 已安装 !" && exit 1
     install_base
     Download
-    vps_info
     Set_port
     Set_passwd
     Set_tag
