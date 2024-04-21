@@ -83,12 +83,12 @@ check_pmc(){
         updates="dnf update -y"
         installs="dnf install -y"
         check_install="dnf list installed"
-        apps=("python3" "python3-cryptography" "vim")
+        apps=("python3" "python3-cryptography" "vim-common")
     elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
         updates="yum update -y"
         installs="yum install -y"
         check_install="rpm -q"
-        apps=("python3" "python3-cryptography" "vim")
+        apps=("python3" "python3-cryptography" "vim-common")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update"
         installs="apk add"
