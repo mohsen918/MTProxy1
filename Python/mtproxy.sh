@@ -90,7 +90,7 @@ check_pmc(){
         updates="yum update -y"
         installs="yum install -y"
         check_install="yum list installed"
-        apps=("python38" "python38-cryptography" "vim-common")
+        apps=("python3.11" "python3.11-cryptography" "vim-common")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update"
         installs="apk add"
