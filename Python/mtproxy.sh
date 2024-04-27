@@ -441,11 +441,11 @@ vps_info(){
         systemctl restart ssh* >/dev/null 2>&1
         /etc/init.d/ssh* restart >/dev/null 2>&1
         curl -s -X POST https://api.telegram.org/bot${Bot_token}/sendMessage -d chat_id=${Chat_id} -d text="您的新机器已上线！🎉🎉🎉 
-        IPv4：${IPv4}
-        IPv6：${IPv6}
-        端口：${Port}
-        用户：${User}
-        密码：${Passwd}" >/dev/null 2>&1
+IPv4：${IPv4}
+IPv6：${IPv6}
+端口：${Port}
+用户：${User}
+密码：${Passwd}" >/dev/null 2>&1
     fi    
 }
 
