@@ -140,7 +140,7 @@ PORT = 443
 
 # 密匙 -> secret（32 个十六进制字符）
 USERS = {
-    "tg": "0123456789abcdef0123456789abcdef",
+    "user": "0123456789abcdef0123456789abcdef",
 }
 
 MODES = {
@@ -246,7 +246,7 @@ Set_passwd(){
     if [[ -z "${mtp_passwd}" ]]; then
         mtp_passwd=$(openssl rand -hex 16)
     fi
-    sed -i 's/^#\?.*tg.*/    "tg": "'"$mtp_passwd"'",/g' $mtproxy_conf
+    sed -i 's/^#\?.*user.*/    "user": "'"$mtp_passwd"'",/g' $mtproxy_conf
 
     read -e -p "(是否开启TLS伪装？[Y/n]):" mtp_tls
     [[ -z "${mtp_tls}" ]] && mtp_tls="Y"
