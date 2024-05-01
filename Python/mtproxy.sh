@@ -246,7 +246,7 @@ Set_passwd(){
     if [[ -z "${mtp_passwd}" ]]; then
         mtp_passwd=$(openssl rand -hex 16)
     fi
-    sed -i 's/^#\?.*user.*/    "user": "'"$mtp_passwd"'",/g' $mtproxy_conf
+    sed -i 's/^#\?.*user".*/    "user": "'"$mtp_passwd"'",/g' $mtproxy_conf
 
     read -e -p "(是否开启TLS伪装？[Y/n]):" mtp_tls
     [[ -z "${mtp_tls}" ]] && mtp_tls="Y"
