@@ -223,15 +223,11 @@ Set_port(){
         echo -e "${Tip} 请输入 MTProxy 端口 [10000-65535]"
         read -e -p "(默认：随机生成):" mtp_port
         [[ -z "${mtp_port}" ]] && mtp_port=$(shuf -i10000-65000 -n1)
-        if [[ $? -eq 0 ]]; then
-            if [[ ${mtp_port} -ge 10000 ]] && [[ ${mtp_port} -le 65535 ]]; then
-                echo && echo "========================"
-                echo -e "  端口 : ${Red_globa} ${mtp_port} ${Nc}"
-                echo "========================" && echo
-                break
-            else
-                echo "输入错误, 请输入正确的端口。"
-            fi
+        if [[ ${mtp_port} -ge 10000 ]] && [[ ${mtp_port} -le 65535 ]]; then
+            echo && echo "========================"
+            echo -e "  端口 : ${Red_globa} ${mtp_port} ${Nc}"
+            echo "========================" && echo
+            break
         else
             echo "输入错误, 请输入正确的端口。"
         fi
