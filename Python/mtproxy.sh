@@ -108,8 +108,8 @@ install_base(){
 
     if [ "${#DEPS[@]}" -ge 1 ]; then
         echo -e "${Info} 安装依赖列表：${Green}${CMDS[@]}${Nc}"
-        $updates
-        $installs ${DEPS[@]}
+        $updates >/dev/null 2>&1
+        $installs ${DEPS[@]} >/dev/null 2>&1
     else
         echo -e "${Info} 所有依赖已存在，不需要额外安装。"
     fi
