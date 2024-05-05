@@ -202,7 +202,8 @@ User=root
 Group=root
 WorkingDirectory=/var/MTProxy
 ExecStart=python3 /var/MTProxy/mtproxy.py
-Restart=always
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
