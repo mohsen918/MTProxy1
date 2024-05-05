@@ -79,19 +79,19 @@ check_pmc(){
     if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "kali" ]]; then
         updates="apt update -y"
         installs="apt install -y"
-        apps=("python3" "xxd")
+        apps=("python3" "python3-cryptography" "xxd")
     elif [[ "$release" == "almalinux" || "$release" == "fedora" || "$release" == "rocky" ]]; then
         updates="dnf update -y"
         installs="dnf install -y"
-        apps=("python3.11" "vim-common")
+        apps=("python3.11" "python3.11-cryptography" "vim-common")
     elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
         updates="yum update -y"
         installs="yum install -y"
-        apps=("python3.11" "vim-common")
+        apps=("python3.11" "python3.11-cryptography" "vim-common")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update -f"
         installs="apk add -f"
-        apps=("python3" "xxd")
+        apps=("python3" "python3-cryptography" "xxd")
     fi
 }
 
