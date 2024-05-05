@@ -583,4 +583,6 @@ ${Green} 8.${Nc} 查看 MTProxy日志
             ;;
     esac
 }
+
+check_root
 menu
