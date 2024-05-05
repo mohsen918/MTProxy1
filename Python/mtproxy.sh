@@ -79,19 +79,19 @@ check_pmc(){
     if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "kali" ]]; then
         updates="apt update -y"
         installs="apt install -y"
-        apps=("python3" "python3-cryptography" "xxd")
+        apps=("python3" "xxd")
     elif [[ "$release" == "almalinux" || "$release" == "fedora" || "$release" == "rocky" ]]; then
         updates="dnf update -y"
         installs="dnf install -y"
-        apps=("python3.11" "python3.11-cryptography" "vim-common")
+        apps=("python3.11" "vim-common")
     elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
         updates="yum update -y"
         installs="yum install -y"
-        apps=("python3.11" "python3.11-cryptography" "vim-common")
+        apps=("python3.11" "vim-common")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update -f"
         installs="apk add -f"
-        apps=("python3" "python3-cryptography" "xxd")
+        apps=("python3" "xxd")
     fi
 }
 
@@ -110,6 +110,9 @@ install_base(){
         echo -e "${Info} 安装依赖列表：${Green}${CMDS[@]}${Nc}"
         $updates >/dev/null 2>&1
         $installs ${DEPS[@]} >/dev/null 2>&1
+        if [[ ! -e /usr/lib/python3/dist-packages/cryptography ]]; then
+            $installs python3-cryptography >/dev/null 2>&1
+        fi
     else
         echo -e "${Info} 所有依赖已存在，不需要额外安装。"
     fi
