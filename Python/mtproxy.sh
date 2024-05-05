@@ -110,9 +110,6 @@ install_base(){
         echo -e "${Info} 安装依赖列表：${Green}${CMDS[@]}${Nc}"
         $updates >/dev/null 2>&1
         $installs ${DEPS[@]} >/dev/null 2>&1
-        if [[ ! -e /usr/lib/python3/dist-packages/cryptography ]]; then
-            $installs python3-cryptography >/dev/null 2>&1
-        fi
     else
         echo -e "${Info} 所有依赖已存在，不需要额外安装。"
     fi
