@@ -79,39 +79,40 @@ check_pmc(){
     if [[ "$release" == "debian" || "$release" == "ubuntu" || "$release" == "kali" ]]; then
         updates="apt update -y"
         installs="apt install -y"
-        check_install="dpkg -s"
-        apps=("python3" "python3-cryptography" "vim-common")
+        apps=("python3" "xxd")
     elif [[ "$release" == "almalinux" || "$release" == "fedora" || "$release" == "rocky" ]]; then
         updates="dnf update -y"
         installs="dnf install -y"
-        check_install="dnf list installed"
-        apps=("python3.11" "python3.11-cryptography" "vim-common")
+        apps=("python3.11" "vim-common")
     elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
         updates="yum update -y"
         installs="yum install -y"
-        check_install="yum list installed"
-        apps=("python3.11" "python3.11-cryptography" "vim-common")
+        apps=("python3.11" "vim-common")
     elif [[ "$release" == "alpine" ]]; then
-        updates="apk update"
-        installs="apk add"
-        check_install="apk info -e"
-        apps=("python3" "py3-cryptography" "vim")
+        updates="apk update -f"
+        installs="apk add -f"
+        apps=("python3" "xxd")
     fi
 }
 
 install_base(){
     check_pmc
+    cmds=("python3" "xxd")
     echo -e "${Info} 你的系统是${Red} $release $os_version ${Nc}"
-    echo
-    for i in "${apps[@]}"
-    do
-        if ! $check_install $i &> /dev/null
-        then
-            echo -e "${Tip} $i 未安装。正在安装..."
-            $updates
-            $installs $i
+    for g in "${!cmds[@]}"; do
+        if [ ! $(type -p ${cmds[g]}) ]; then
+            CMDS+=(${cmds[g]})
+            DEPS+=(${apps[g]})
         fi
     done
+
+    if [ "${#DEPS[@]}" -ge 1 ]; then
+        echo -e "${Info} 安装依赖列表：${Green}${CMDS[@]}${Nc}"
+        $updates
+        $installs ${DEPS[@]}
+    else
+        echo -e "${Info} 所有依赖已存在，不需要额外安装。"
+    fi
 }
 
 check_pid(){
