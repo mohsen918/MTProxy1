@@ -42,12 +42,16 @@ check_release(){
         echo
     elif [[ "${release}" == "centos" ]]; then
         if [[ ${os_version} -lt 8 ]]; then
-            echo -e " ${Error} 请使用${Red} CentOS 8${Nc} 或更高版本" && exit 1
+            echo -e "${Info} 你的系统是${Red} $release $os_version ${Nc}"
+            echo -e "${Error} 请使用${Red} $release 8${Nc} 或更高版本" && exit 1
         fi
     elif [[ "${release}" == "ubuntu" ]]; then
         echo
     elif [[ "${release}" == "fedora" ]]; then
-        echo
+        if [[ ${os_version} -lt 30 ]]; then
+            echo -e "${Info} 你的系统是${Red} $release $os_version ${Nc}"
+            echo -e "${Error} 请使用${Red} $release 30${Nc} 或更高版本" && exit 1
+        fi
     elif [[ "${release}" == "debian" ]]; then
         echo
     elif [[ "${release}" == "almalinux" ]]; then
@@ -80,45 +84,52 @@ check_pmc(){
         updates="apt update -y"
         installs="apt install -y"
         check_install="dpkg -s"
-        apps=("python3" "python3-cryptography" "xxd")
-    elif [[ "$release" == "almalinux" || "$release" == "fedora" || "$release" == "rocky" ]]; then
-        updates="dnf update -y"
-        installs="dnf install -y"
-        check_install="dnf list installed"
-        apps=("python3.11" "python3.11-cryptography" "vim-common")
-    elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
-        updates="yum update -y"
-        installs="yum install -y"
-        check_install="yum list installed"
-        apps=("python3.11" "python3.11-cryptography" "vim-common")
+        apps=("python3" "python3-cryptography" "xxd" "procps" "iproute2")
     elif [[ "$release" == "alpine" ]]; then
         updates="apk update -f"
         installs="apk add -f"
         check_install="apk info -e"
-        apps=("python3" "py3-cryptography" "xxd")
+        apps=("python3" "py3-cryptography" "xxd" "procps" "iproute2")
+    elif [[ "$release" == "almalinux" || "$release" == "rocky" ]]; then
+        updates="dnf update -y"
+        installs="dnf install -y"
+        check_install="dnf list installed"
+        apps=("python3.11" "python3.11-cryptography" "vim-common" "procps-ng" "iproute")
+    elif [[ "$release" == "centos" || "$release" == "oracle" ]]; then
+        updates="yum update -y"
+        installs="yum install -y"
+        check_install="yum list installed"
+        apps=("python3.11" "python3.11-cryptography" "vim-common" "procps-ng" "iproute")
+    elif [[ "$release" == "fedora" ]]; then
+        updates="dnf update -y"
+        installs="dnf install -y"
+        check_install="dnf list installed"
+        apps=("python3" "python3-cryptography" "vim-common" "procps-ng" "iproute")
     fi
 }
 
 install_base(){
     check_pmc
+    cmds=("python3" "cryptography" "xxd" "ps" "ip")
     echo -e "${Info} 你的系统是${Red} $release $os_version ${Nc}"
     echo
-    msg_deps=()
+    DEPS=()
     for g in "${!apps[@]}"; do
         if ! $check_install "${apps[$g]}" &> /dev/null; then
-            msg_deps+=("${apps[$g]}")
+            CMDS+=(${cmds[g]})
+            DEPS+=("${apps[$g]}")
         fi
     done
     
-    if [ ${#msg_deps[@]} -gt 0 ]; then
-        echo -e "${Tip} 安装依赖列表：${Green}${msg_deps[@]}${Nc}"
+    if [ ${#DEPS[@]} -gt 0 ]; then
+        echo -e "${Tip} 安装依赖列表：${Green}${CMDS[@]}${Nc} 请稍后..."
         $updates &> /dev/null
-        $installs "${msg_deps[@]}" &> /dev/null
+        $installs "${DEPS[@]}" &> /dev/null
     else
         echo -e "${Info} 所有依赖已存在，不需要额外安装。"
     fi
 
-    if [[ "$release" == "almalinux" || "$release" == "fedora" || "$release" == "rocky" || "$release" == "centos" || "$release" == "oracle" ]]; then
+    if [[ "$release" == "almalinux" || "$release" == "rocky" || "$release" == "centos" || "$release" == "oracle" ]]; then
         ln -sf /usr/bin/python3.11 /usr/bin/python3
     fi
 }
@@ -521,7 +532,7 @@ backmenu(){
     esac
 }
 
-menu() {
+menu(){
     clear
     echo -e "${Green}######################################
 #          ${Red}MTProxy 一键脚本          ${Green}#
