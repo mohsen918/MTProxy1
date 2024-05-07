@@ -68,7 +68,7 @@ check_release(){
         echo -e "-${Red} Ubuntu${Nc} "
         echo -e "-${Red} Debian ${Nc}"
         echo -e "-${Red} CentOS 8+ ${Nc}"
-        echo -e "-${Red} Fedora ${Nc}"
+        echo -e "-${Red} Fedora 30+${Nc}"
         echo -e "-${Red} Kali ${Nc}"
         echo -e "-${Red} AlmaLinux ${Nc}"
         echo -e "-${Red} Rocky Linux ${Nc}"
