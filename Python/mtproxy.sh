@@ -118,7 +118,6 @@ install_base(){
     cmds=("openssl" "python3" "cryptography" "xxd" "ps" "ip")
     echo -e "${Info} 你的系统是${Red} $release $os_version ${Nc}"
     echo
-    DEPS=()
     for g in "${!apps[@]}"; do
         if ! $check_install "${apps[$g]}" &> /dev/null; then
             CMDS+=(${cmds[g]})
